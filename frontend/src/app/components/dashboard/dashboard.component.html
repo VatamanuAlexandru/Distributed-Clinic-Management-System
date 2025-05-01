@@ -1,0 +1,68 @@
+<header class="shadow-sm bg-gray-800">
+  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
+    <p class="text-gray-400 mt-2">Bine ai revenit în sistemul de management al clinicii! 👋</p>
+  </div>
+</header>
+
+<main class="px-4 py-10">
+  <!-- Carduri statistici -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <!-- Pacienți -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-user-injured text-2xl text-gray-400"></i>
+        <div>
+          <p class="text-sm text-gray-400">Număr pacienți</p>
+          <p class="text-2xl font-bold">1.245</p>
+          <p class="text-green-400 text-sm mt-1">↑ 4.3% <span class="text-gray-400">față de luna trecută</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medici -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-user-doctor text-2xl text-gray-400"></i>
+        <div>
+          <p class="text-sm text-gray-400">Medici activi</p>
+          <p class="text-2xl font-bold">53</p>
+          <p class="text-green-400 text-sm mt-1">↑ 2.1% <span class="text-gray-400">față de luna trecută</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Programări -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-calendar-check text-2xl text-gray-400"></i>
+        <div>
+          <p class="text-sm text-gray-400">Programări azi</p>
+          <p class="text-2xl font-bold">128</p>
+          <p class="text-red-400 text-sm mt-1">↓ 1.8% <span class="text-gray-400">față de ieri</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback-uri -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-comments text-2xl text-gray-400"></i>
+        <div>
+          <p class="text-sm text-gray-400">Feedback-uri</p>
+          <p class="text-2xl font-bold">87</p>
+          <p class="text-green-400 text-sm mt-1">↑ 5.9% <span class="text-gray-400">feedback pozitiv</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graf -->
+  <!-- Graf -->
+  <div class="bg-gray-800 rounded-lg p-6 shadow-md text-white max-w-4xl mx-auto">
+    <h2 class="text-xl font-semibold mb-4">Programări pe zile</h2>
+    <div class="relative h-64">
+      <canvas id="appointmentsChart" class="w-full h-full"></canvas>
+    </div>
+  </div>
+</main>

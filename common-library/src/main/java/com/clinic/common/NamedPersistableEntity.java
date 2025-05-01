@@ -8,9 +8,12 @@ import lombok.Setter;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class NamedPersistableEntity extends PersistableEntity {
+public class NamedPersistableEntity extends PersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "NAME", nullable = false)
-	private String name;
+	protected String name;
+
+	@Column(name = "DESCRIPTION", columnDefinition = "TEXT")
+	protected String description;
 }

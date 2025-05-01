@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4e07dcb0-89a7-4d6f-aa73-a6d62f6902ee" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../common-library/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/ErasablePersistableEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/ErasablePersistableEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/NamedPersistableEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/NamedPersistableEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/PersistableEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/PersistableEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/service/BaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/service/BaseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/common/service/BaseServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/mapper/ModelMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/java/com/clinic/mapper/ModelMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../common-library/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../common-library/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/src/main/java/com/clinic/userservice/UserServiceApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../user-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../user-service/src/test/java/com/clinic/user_service/UserServiceApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2v0Y67lAYaajO5vNtrOz9ESrLmY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/alex/Desktop/Distributed-Clinic-Management-System/frontend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.Angular CLI Server.executor": "Run",
+    "ts.external.directory.path": "/home/alex/Desktop/Distributed-Clinic-Management-System/clinic-workspace/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.Angular CLI Server">
+    <configuration name="Angular Application" type="JavascriptDebugType" uri="http://localhost:4200">
+      <method v="2" />
+    </configuration>
+    <configuration name="Angular CLI Server" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4e07dcb0-89a7-4d6f-aa73-a6d62f6902ee" name="Changes" comment="" />
+      <created>1743283282482</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743283282482</updated>
+      <workItem from="1743283284431" duration="2021000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

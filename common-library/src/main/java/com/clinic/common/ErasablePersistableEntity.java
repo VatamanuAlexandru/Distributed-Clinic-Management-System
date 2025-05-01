@@ -8,7 +8,7 @@ import lombok.Setter;
 @MappedSuperclass
 @Setter
 @Getter
-public abstract class ErasablePersistableEntity extends PersistableEntity {
+public class ErasablePersistableEntity extends PersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "DELETED", nullable = false)
