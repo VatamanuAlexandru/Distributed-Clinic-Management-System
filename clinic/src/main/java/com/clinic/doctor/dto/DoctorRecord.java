@@ -1,5 +1,8 @@
 package com.clinic.doctor.dto;
 
+import java.util.List;
+
+import com.clinic.administrative.dto.OfficeRecord;
 import com.clinic.common.dto.PersonRecord;
 import com.clinic.mapper.BaseRecord;
 import com.clinic.mapper.ExcludeMapping;
@@ -14,9 +17,10 @@ public class DoctorRecord extends BaseRecord {
 
 	@ExcludeMapping
 	private PersonRecord person;
-	private String title;
-	private String rank;
+	private MedicalTitleRecord medicalTitle;
+	private MedicalRankRecord medicalRank;
 	private Integer yearsOfExperience;
 	private OfficeRecord office;
+	private List<MedicalServiceRecord> services;
 
 }

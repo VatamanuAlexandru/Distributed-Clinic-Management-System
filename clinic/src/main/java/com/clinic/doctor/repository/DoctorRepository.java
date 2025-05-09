@@ -12,4 +12,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	@Query("SELECT d FROM Doctor d  " + "JOIN MedicalDepartment md ON md.doctor.id = d.id "
 			+ "WHERE md.department.id = ?1")
 	List<Doctor> findByDepartmentId(Long departmentId);
+
+	@Query("SELECT d FROM Doctor d " + "JOIN d.services ms " + "WHERE ms.id = ?1")
+	List<Doctor> findByServiceId(Long serviceId);
 }

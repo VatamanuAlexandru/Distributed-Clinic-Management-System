@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 })
 export class DashboardComponent implements AfterViewInit {
   ngAfterViewInit(): void {
-    // 👉 Înregistrăm toate elementele necesare Chart.js
     Chart.register(...registerables);
 
     const ctx = document.getElementById('appointmentsChart') as HTMLCanvasElement;

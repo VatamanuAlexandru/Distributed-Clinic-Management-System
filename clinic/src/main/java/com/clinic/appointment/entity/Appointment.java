@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.clinic.administrative.entity.Office;
 import com.clinic.common.PersistableEntity;
 import com.clinic.doctor.entity.Doctor;
+import com.clinic.doctor.entity.MedicalService;
 import com.clinic.patient.entity.Patient;
 
 import jakarta.persistence.Column;
@@ -40,6 +41,10 @@ public class Appointment extends PersistableEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "OFFICE_ID")
 	private Office office;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "SERVICE_ID")
+	private MedicalService service;
 
 	@Column(name = "APPOINTMENT_DATE")
 	private LocalDateTime appointmentDate;

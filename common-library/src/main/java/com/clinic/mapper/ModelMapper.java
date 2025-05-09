@@ -2,9 +2,11 @@ package com.clinic.mapper;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -54,43 +56,69 @@ public class ModelMapper {
 		}
 	}
 
-	/**
-	 * Maps complex fields between source and target objects recursively. Handles
-	 * both Entity to DTO and DTO to Entity conversions.
-	 * 
-	 * @param source   The source object (entity or DTO).
-	 * @param target   The target object (entity or DTO).
-	 * @param isEntity Boolean flag indicating if target is an entity.
-	 * @throws IllegalAccessException if the field is inaccessible.
-	 * @throws ClassNotFoundException if target class is not found.
-	 */
 	private <T, K> void mapComplexFields(T source, K target, boolean isEntity)
 			throws IllegalAccessException, ClassNotFoundException {
+
 		List<Field> complexFields = getComplexFields(source.getClass());
+
 		for (Field field : complexFields) {
 			field.setAccessible(true);
 			Object value = field.get(source);
-			String className = value.getClass().getSimpleName().replace("Record", "");
-			String packageName = target.getClass().getPackageName().replace(".entity", "");
-			if (value != null && isEntity == true) {
-				Class<?> targetClass = Class.forName(packageName + ".entity." + className);
-				Object mappedValue = convertToEntity(value, targetClass);
-				try {
-					Field targetField = target.getClass().getDeclaredField(field.getName());
-					targetField.setAccessible(true);
-					targetField.set(target, mappedValue);
-				} catch (NoSuchFieldException e) {
-				}
-			} else if (value != null) {
-				Object mappedValue = convertToDto(value, Class.forName(packageName + "." + className + "Record"));
-				try {
-					Field targetField = target.getClass().getDeclaredField(field.getName());
-					targetField.setAccessible(true);
-					targetField.set(target, mappedValue);
-				} catch (NoSuchFieldException e) {
+			if (value == null)
+				continue;
 
+			Field targetField;
+			try {
+				targetField = target.getClass().getDeclaredField(field.getName());
+				if (targetField.isAnnotationPresent(ExcludeMapping.class)) {
+					continue;
 				}
+			} catch (NoSuchFieldException e) {
+				continue;
 			}
+
+			if (value instanceof Collection<?> collection && !collection.isEmpty()) {
+				Object firstItem = collection.iterator().next();
+				Class<?> componentClass = HibernateProxy.class.isAssignableFrom(firstItem.getClass())
+						? ((HibernateProxy) firstItem).getHibernateLazyInitializer().getPersistentClass()
+						: firstItem.getClass();
+
+				String className = componentClass.getSimpleName().replace("Record", "");
+				String packageName = isEntity ? target.getClass().getPackageName().replace(".dto", "")
+						: componentClass.getPackageName().replace(".entity", ".dto");
+
+				Collection<Object> mappedCollection = collection.stream().map(item -> {
+					try {
+						if (isEntity) {
+							Class<?> entityClass = Class.forName(packageName + ".entity." + className);
+							return convertToEntity(item, entityClass);
+						} else {
+							Class<?> dtoClass = Class.forName(packageName + "." + className + "Record");
+							return convertToDto(item, dtoClass);
+						}
+					} catch (Exception ex) {
+						throw new RuntimeException("Failed to map collection item in field: " + field.getName(), ex);
+					}
+				}).collect(Collectors.toList());
+
+				targetField.setAccessible(true);
+				targetField.set(target, mappedCollection);
+				continue;
+			}
+
+			Class<?> realClass = HibernateProxy.class.isAssignableFrom(value.getClass())
+					? ((HibernateProxy) value).getHibernateLazyInitializer().getPersistentClass()
+					: value.getClass();
+
+			String className = realClass.getSimpleName().replace("Record", "");
+			String packageName = isEntity ? target.getClass().getPackageName().replace(".dto", "")
+					: realClass.getPackageName().replace(".entity", ".dto");
+
+			Object mappedValue = isEntity ? convertToEntity(value, Class.forName(packageName + ".entity." + className))
+					: convertToDto(value, Class.forName(packageName + "." + className + "Record"));
+
+			targetField.setAccessible(true);
+			targetField.set(target, mappedValue);
 		}
 	}
 

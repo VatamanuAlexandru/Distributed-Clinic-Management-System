@@ -1,24 +1,41 @@
-<nav class="bg-gray-800">
+<nav
+  class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-md fixed w-full z-50 top-0 left-0 transition-colors duration-300">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="flex h-16 items-center justify-between">
-      <div class="flex items-center">
-        <div class="shrink-0">
-          <img class="size-8" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Clinica Medicala">
-        </div>
-        <div class="hidden md:block">
-          <div class="ml-10 flex items-baseline space-x-4">
-            <a routerLink="/dashboard" routerLinkActive="bg-gray-900 text-white"
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Dashboard</a>
-            <a routerLink="/medici" routerLinkActive="bg-gray-900 text-white"
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Medici</a>
-          </div>
-        </div>
+
+      <div class="flex items-center space-x-3">
+        <img class="w-8 h-8" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+          alt="Logo Clinica" />
+        <span class="text-gray-900 dark:text-white text-lg font-semibold hidden sm:inline">Clinica Medicală</span>
       </div>
-      <div class="hidden md:block">
-        <div class="ml-4 flex items-center md:ml-6">
-          <button class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Ieșire</button>
-        </div>
+
+      <div class="hidden md:flex space-x-6">
+        <a routerLink="/dashboard" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          Dashboard
+        </a>
+        <a routerLink="/medici" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          Medici
+        </a>
+        <a routerLink="/services" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          Servicii
+        </a>
       </div>
+
+      <button (click)="toggleTheme()"
+        class="ml-4 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+        <span class="dark:hidden">🌙 Dark</span>
+        <span class="hidden dark:inline">☀️ Light</span>
+      </button>
+
+      <div class="ml-4">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">
+          Ieșire
+        </button>
+      </div>
+
     </div>
   </div>
 </nav>

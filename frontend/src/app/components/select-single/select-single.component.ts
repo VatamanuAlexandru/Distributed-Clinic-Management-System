@@ -18,26 +18,34 @@ export class SelectSingleComponent {
 
   isOpen = false;
   searchTerm = '';
-
+  
   get filteredItems() {
-    return this.items.filter(i => i.label.toLowerCase().includes(this.searchTerm.toLowerCase()));
+    if (!Array.isArray(this.items)) return [];
+    return this.items.filter(i =>
+      typeof i.label === 'string' &&
+      i.label.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
   }
+  
+  
 
   toggle() {
     this.isOpen = !this.isOpen;
   }
 
   selectItem(id: number) {
+    console.log('ID selectat:', id);
     this.selectedId = id;
     this.selectedChange.emit(id);
     this.isOpen = false;
     this.searchTerm = '';
   }
-
+  
   get selectedLabel(): string | null {
     const item = this.items.find(i => i.selectedId === this.selectedId);
     return item?.label || null;
   }
+  
   
 
   clearSelection() {

@@ -1,68 +1,94 @@
-<header class="shadow-sm bg-gray-800">
-  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-    <h1 class="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
-    <p class="text-gray-400 mt-2">Bine ai revenit în sistemul de management al clinicii! 👋</p>
-  </div>
-</header>
+<main class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white px-6 py-10">
+  <div class="max-w-7xl mx-auto">
 
-<main class="px-4 py-10">
-  <!-- Carduri statistici -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-    <!-- Pacienți -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
-      <div class="flex items-center gap-4">
-        <i class="fa-solid fa-user-injured text-2xl text-gray-400"></i>
-        <div>
-          <p class="text-sm text-gray-400">Număr pacienți</p>
-          <p class="text-2xl font-bold">1.245</p>
-          <p class="text-green-400 text-sm mt-1">↑ 4.3% <span class="text-gray-400">față de luna trecută</span></p>
+    <div class="flex items-center justify-between mb-10">
+      <div class="flex items-center space-x-3">
+        <h1 class="text-2xl sm:text-3xl font-bold">Clinica Medicală - Dashboard</h1>
+      </div>
+      <span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Ultima actualizare: acum 2 ore</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-user-injured text-3xl text-indigo-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Pacienți înregistrați</p>
+            <p class="text-2xl font-bold">1.245</p>
+            <p class="text-green-500 text-sm mt-1">↑ 4.3% <span class="text-gray-400">față de luna trecută</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-user-doctor text-3xl text-green-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Medici activi</p>
+            <p class="text-2xl font-bold">53</p>
+            <p class="text-green-500 text-sm mt-1">↑ 2.1% <span class="text-gray-400">față de luna trecută</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-calendar-check text-3xl text-yellow-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Programări azi</p>
+            <p class="text-2xl font-bold">128</p>
+            <p class="text-red-500 text-sm mt-1">↓ 1.8% <span class="text-gray-400">față de ieri</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-comments text-3xl text-pink-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Feedback-uri</p>
+            <p class="text-2xl font-bold">87</p>
+            <p class="text-green-500 text-sm mt-1">↑ 5.9% <span class="text-gray-400">feedback pozitiv</span></p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Medici -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
-      <div class="flex items-center gap-4">
-        <i class="fa-solid fa-user-doctor text-2xl text-gray-400"></i>
-        <div>
-          <p class="text-sm text-gray-400">Medici activi</p>
-          <p class="text-2xl font-bold">53</p>
-          <p class="text-green-400 text-sm mt-1">↑ 2.1% <span class="text-gray-400">față de luna trecută</span></p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700">
+        <h2 class="text-lg font-semibold mb-4">Programări în ultimele 7 zile</h2>
+        <div class="relative h-64">
+          <canvas id="appointmentsChart" class="w-full h-full"></canvas>
         </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700">
+        <h2 class="text-lg font-semibold mb-4">Stare generală</h2>
+        <ul class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+          <li class="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+            <span>Clinicile active</span><span class="font-semibold">8</span>
+          </li>
+          <li class="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+            <span>Programări viitoare</span><span class="font-semibold">312</span>
+          </li>
+          <li class="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+            <span>Consultații azi</span><span class="font-semibold">67</span>
+          </li>
+          <li class="flex justify-between">
+            <span>Feedback mediu</span><span class="text-green-500 font-semibold">4.5 / 5</span>
+          </li>
+        </ul>
       </div>
     </div>
 
-    <!-- Programări -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
-      <div class="flex items-center gap-4">
-        <i class="fa-solid fa-calendar-check text-2xl text-gray-400"></i>
-        <div>
-          <p class="text-sm text-gray-400">Programări azi</p>
-          <p class="text-2xl font-bold">128</p>
-          <p class="text-red-400 text-sm mt-1">↓ 1.8% <span class="text-gray-400">față de ieri</span></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feedback-uri -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow-md text-white hover:shadow-lg transition">
-      <div class="flex items-center gap-4">
-        <i class="fa-solid fa-comments text-2xl text-gray-400"></i>
-        <div>
-          <p class="text-sm text-gray-400">Feedback-uri</p>
-          <p class="text-2xl font-bold">87</p>
-          <p class="text-green-400 text-sm mt-1">↑ 5.9% <span class="text-gray-400">feedback pozitiv</span></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Graf -->
-  <!-- Graf -->
-  <div class="bg-gray-800 rounded-lg p-6 shadow-md text-white max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Programări pe zile</h2>
-    <div class="relative h-64">
-      <canvas id="appointmentsChart" class="w-full h-full"></canvas>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700 mt-12 max-w-4xl mx-auto">
+      <h2 class="text-lg font-semibold mb-4">Activitate recentă</h2>
+      <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+        <li>🟢 Pacientul <strong>Ion Popescu</strong> a fost consultat de <strong>Dr. Lupu</strong> (ORL)</li>
+        <li>🔵 Programare nouă: <strong>Maria T.</strong> pentru <strong>Psihiatrie</strong></li>
+        <li>🟡 Feedback: <strong>Dr. Dumitrescu</strong> – „Foarte profesionist!”</li>
+        <li>🔴 Anulare: <strong>George I.</strong> (Cardiologie)</li>
+      </ul>
     </div>
   </div>
 </main>

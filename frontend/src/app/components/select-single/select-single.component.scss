@@ -1,4 +1,15 @@
-select:focus {
-    outline: none;
-  }
-  
+button {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+input::placeholder {
+  color: #aaa;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  border-radius: 8px;
+}

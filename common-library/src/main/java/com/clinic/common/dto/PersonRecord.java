@@ -3,6 +3,8 @@ package com.clinic.common.dto;
 import java.time.LocalDateTime;
 
 import com.clinic.mapper.BaseRecord;
+import com.clinic.mapper.ExcludeMapping;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,7 +17,9 @@ public class PersonRecord extends BaseRecord {
 	private String firstName;
 	private LocalDateTime birthdate;
 	private String personalId;
+	@ExcludeMapping
 	private ContactInfoRecord contactInfo;
+	@ExcludeMapping
 	private AddressInfoRecord addressInfo;
 
 }

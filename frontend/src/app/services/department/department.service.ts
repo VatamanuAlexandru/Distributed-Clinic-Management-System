@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class DepartmentService {
 
-  private readonly baseUrl = 'http://localhost:8085/clinic/department/select';
+  private readonly baseUrl = 'http://localhost:8080/clinic/department/select';
 
   constructor(private http: HttpClient) {}
 

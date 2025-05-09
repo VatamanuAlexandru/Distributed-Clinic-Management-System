@@ -33,4 +33,15 @@ public class DoctorController {
 		return ResponseEntity.ok(doctorRecords);
 	}
 
+	@GetMapping("/get/{id}")
+	public ResponseEntity<?> getDoctorById(@PathVariable Long id) {
+		DoctorRecord doctorRecord = doctorService.getDoctorById(id);
+		return ResponseEntity.ok(doctorRecord);
+	}
+
+	@GetMapping("/by-service/{serviceId}")
+	public ResponseEntity<List<DoctorRecord>> getDoctorByServiceId(@PathVariable Long serviceId) {
+		return ResponseEntity.ok(doctorService.getDoctorByServiceId(serviceId));
+	}
+
 }

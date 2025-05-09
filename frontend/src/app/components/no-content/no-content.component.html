@@ -1,0 +1,16 @@
+<div
+    class="max-w-md mx-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-md flex flex-col items-center text-center transition-all duration-300">
+
+    <div class="flex items-center justify-center w-20 h-20 mb-5 rounded-full bg-blue-50 dark:bg-gray-700">
+        <svg class="w-10 h-10 text-blue-500 dark:text-blue-300 animate-pulse" fill="none" stroke="currentColor"
+            viewBox="0 0 48 48">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 20h.01M28 20h.01M12 32c2-2 6-4 12-4s10 2 12 4m-8-24c-6.627 0-12 5.373-12 12 0 4.418 3.582 8 8 8s8-3.582 8-8c0-6.627-5.373-12-12-12z" />
+        </svg>
+    </div>
+
+    <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Nicio înregistrare găsită</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+        {{ message || 'Nu am putut găsi datele căutate. Încearcă alt filtru sau revino mai târziu.' }}
+    </p>
+</div>

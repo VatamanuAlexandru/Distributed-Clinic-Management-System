@@ -1,0 +1,57 @@
+<section class="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4">
+    <div class="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12">
+
+        <div class="flex flex-col lg:flex-row gap-10">
+
+            <div class="flex flex-col items-center text-center lg:w-1/3">
+                <img [src]="'https://ui-avatars.com/api/?name=' + doctor?.person.firstName + '+' + doctor?.person.lastName"
+                    class="w-36 h-36 rounded-full border-4 border-blue-500 shadow-lg mb-4" alt="Doctor Avatar" />
+
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ doctor?.person.lastName }} {{ doctor?.person.firstName }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                    {{ doctor?.medicalTitle?.name || 'Fără titlu' }} • {{ doctor?.medicalRank?.name || 'Fără grad' }}
+                </p>
+
+                <div class="mt-4 flex gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <span class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">Experiență: {{
+                        doctor?.yearsOfExperience || 0 }} ani</span>
+                    <span
+                        class="bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300 px-3 py-1 rounded-full">★
+                        4.8 rating</span>
+                </div>
+            </div>
+
+            <div class="flex-1 space-y-8">
+
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Informații de contact</h3>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                        <li><strong>Email:</strong> {{ doctor?.person.contactInfo?.email || 'Nedisponibil' }}</li>
+                        <li><strong>Telefon:</strong> {{ doctor?.person.contactInfo?.phone || 'Nedisponibil' }}</li>
+                        <li><strong>Adresă:</strong> {{ doctor?.person.addressInfo?.city || '-' }}, {{
+                            doctor?.person.addressInfo?.street || '' }}</li>
+                    </ul>
+                </div>
+
+                <div class="mt-6">
+                    <button
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md shadow transition duration-200">
+                        Programează-te cu acest medic
+                    </button>
+                </div>
+
+                <div class="mt-6">
+                    <button
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md shadow transition duration-200"
+                        (click)="back()">
+                        Inapoi
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.clinic.appointment.dto.AppointmentRecord;
 import com.clinic.appointment.entity.Appointment;
 import com.clinic.appointment.entity.AppointmentStatus;
 import com.clinic.appointment.repository.AppointmentRepository;
 import com.clinic.common.service.BaseService;
 import com.clinic.doctor.entity.Doctor;
 import com.clinic.doctor.repository.DoctorRepository;
+import com.clinic.mapper.ModelMapper;
 import com.clinic.patient.entity.Patient;
 import com.clinic.patient.repository.PatientRepository;
 
@@ -28,12 +30,16 @@ public class AppointmentService extends BaseService<Appointment> {
 	@Autowired
 	private DoctorRepository doctorRepository;
 
+	@Autowired
+	private ModelMapper modelMapper;
+
 	@Override
 	protected JpaRepository<Appointment, Long> getRepository() {
 		return appointmentRepository;
 	}
 
-	public Appointment makeAppointment(Long doctorId, Long patientId, String reason, LocalDateTime appointmentDate) {
+	public AppointmentRecord makeAppointment(Long doctorId, Long patientId, String reason,
+			LocalDateTime appointmentDate) {
 		Optional<Patient> patientOpt = patientRepository.findById(patientId);
 		Optional<Doctor> doctorOpt = doctorRepository.findById(doctorId);
 
@@ -66,7 +72,10 @@ public class AppointmentService extends BaseService<Appointment> {
 		appointment.setStatus(AppointmentStatus.PENDING);
 		appointment.setOffice(doctor.getOffice());
 		appointment.setReason(reason);
-		return appointmentRepository.save(appointment);
+		appointmentRepository.save(appointment);
+
+		AppointmentRecord appointmentRecord = this.modelMapper.convertToDto(appointment, AppointmentRecord.class);
+		return appointmentRecord;
 
 	}
 

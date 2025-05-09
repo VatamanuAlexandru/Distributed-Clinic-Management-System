@@ -11,7 +11,6 @@
         </h1>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-          <!-- EMAIL -->
           <div>
             <label for="email" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Email</label>
             <input type="email" id="email" formControlName="email" placeholder="name@company.com"
@@ -26,7 +25,6 @@
             </p>
           </div>
 
-          <!-- PASSWORD -->
           <div>
             <label for="password" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Password</label>
             <input type="password" id="password" formControlName="password" placeholder="••••••••"
@@ -41,7 +39,6 @@
             </p>
           </div>
 
-          <!-- REMEMBER & FORGOT -->
           <div class="flex items-center justify-between">
             <label class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-300">
               <input id="remember" type="checkbox" class="w-4 h-4 rounded border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
@@ -50,16 +47,13 @@
             <a href="#" class="text-sm text-blue-600 hover:underline dark:text-blue-400">Forgot password?</a>
           </div>
 
-          <!-- BUTTON -->
           <button type="submit"
                   class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             Sign in
           </button>
 
-          <!-- ERROR -->
           <p *ngIf="errorMessage" class="text-sm text-red-500 text-center">{{ errorMessage }}</p>
 
-          <!-- SIGNUP LINK -->
           <p class="text-sm font-light text-gray-500 dark:text-gray-400 text-center">
             Don’t have an account?
             <a href="#" class="font-medium text-blue-600 hover:underline dark:text-blue-400">Sign up</a>

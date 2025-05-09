@@ -10,6 +10,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -39,7 +41,7 @@ public class Doctor extends PersistableEntity {
 	private MedicalRank medicalRank;
 
 	@Column(name = "YEARS_OF_EXPERIENCE")
-	private Integer yearsOfExpereience;
+	private Integer yearsOfExperience;
 
 	@OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
 	private List<MedicalDepartment> medicalDepartments;
@@ -47,4 +49,9 @@ public class Doctor extends PersistableEntity {
 	@ManyToOne
 	@JoinColumn(name = "OFFICE_ID")
 	private Office office;
+
+	@ManyToMany
+	@JoinTable(name = "DOCTOR_SERVICE", joinColumns = @JoinColumn(name = "DOCTOR_ID"), inverseJoinColumns = @JoinColumn(name = "SERVICE_ID"))
+	private List<MedicalService> services;
+
 }

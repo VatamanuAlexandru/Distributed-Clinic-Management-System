@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.clinic.common.dto.AddressInfoRecord;
+import com.clinic.common.dto.ContactInfoRecord;
 import com.clinic.common.dto.PersonRecord;
 import com.clinic.common.service.BaseService;
 import com.clinic.mapper.ModelMapper;
+import com.clinic.user_service.entity.AddressInfo;
 import com.clinic.user_service.entity.Person;
 import com.clinic.user_service.repository.PersonRepository;
 
@@ -27,7 +30,28 @@ public class PersonService extends BaseService<Person> {
 	public PersonRecord getRecordByPersonId(Long personId) {
 		Person person = personRepository.findById(personId)
 				.orElseThrow(() -> new IllegalArgumentException("Person not found with ID: " + personId));
-		return modelMapper.convertToDto(person, PersonRecord.class);
+		PersonRecord personRecord = modelMapper.convertToDto(person, PersonRecord.class);
+
+		ContactInfoRecord contanctInfoRecord = new ContactInfoRecord();
+		contanctInfoRecord.setEmailAddress(person.getContactInfo().getEmailAddress());
+		contanctInfoRecord.setPhoneNumber(person.getContactInfo().getPhoneNumber());
+
+		AddressInfoRecord addressInfoRecord = new AddressInfoRecord();
+		AddressInfo serverAddressInfo = person.getAddressInfo();
+		addressInfoRecord.setBuilding(serverAddressInfo.getBuilding());
+		addressInfoRecord.setCity(serverAddressInfo.getCity());
+		addressInfoRecord.setCountry(serverAddressInfo.getCountry());
+		addressInfoRecord.setCounty(serverAddressInfo.getCounty());
+		addressInfoRecord.setEntrance(serverAddressInfo.getEntrance());
+		addressInfoRecord.setFlatNumer(serverAddressInfo.getFlatNumer());
+		addressInfoRecord.setPostalCode(serverAddressInfo.getPostalCode());
+		addressInfoRecord.setStreetName(serverAddressInfo.getStreetName());
+		addressInfoRecord.setStreetNumber(serverAddressInfo.getStreetNumber());
+
+		personRecord.setAddressInfo(addressInfoRecord);
+		personRecord.setContactInfo(contanctInfoRecord);
+
+		return personRecord;
 	}
 
 }

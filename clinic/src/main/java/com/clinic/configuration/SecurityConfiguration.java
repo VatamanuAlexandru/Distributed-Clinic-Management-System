@@ -10,8 +10,10 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(
-				authorize -> authorize.requestMatchers("/patient/**").permitAll().anyRequest().authenticated());
+		http.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers("/patient/**", "/department/**", "/doctor/**", "/person/**", "/services/**")
+						.permitAll().anyRequest().authenticated());
 		return http.build();
 	}
 }

@@ -62,4 +62,44 @@ public class DoctorService extends BaseService<Doctor> {
 		return doctorRecords;
 	}
 
+	public DoctorRecord getDoctorById(Long id) {
+		Doctor doctor = doctorRepository.findById(id).orElse(null);
+		DoctorRecord doctorRecord = new DoctorRecord();
+		if (doctor != null) {
+			doctorRecord = modelMapper.convertToDto(doctor, DoctorRecord.class);
+			try {
+				var person = personClient.getPersonById(doctor.getPersonId());
+				doctorRecord.setPerson(person);
+			} catch (Exception e) {
+				System.err.println("Persoana cu ID-ul " + doctor.getPersonId() + " nu a fost găsită!");
+			}
+		}
+
+		return doctorRecord;
+	}
+
+	public List<DoctorRecord> getDoctorByServiceId(Long serviceId) {
+		List<Doctor> doctors = doctorRepository.findByServiceId(serviceId);
+		List<DoctorRecord> doctorRecords = new ArrayList<>();
+
+		if (!doctors.isEmpty()) {
+			doctorRecords = doctors.stream().map(d -> modelMapper.convertToDto(d, DoctorRecord.class))
+					.collect(Collectors.toList());
+		}
+
+		for (int i = 0; i < doctorRecords.size(); i++) {
+			DoctorRecord record = doctorRecords.get(i);
+			Long personId = doctors.get(i).getPersonId();
+
+			try {
+				var person = personClient.getPersonById(personId);
+				record.setPerson(person);
+			} catch (Exception e) {
+				System.err.println("Persoana cu ID-ul " + personId + " nu a fost găsită!");
+			}
+		}
+
+		return doctorRecords;
+	}
+
 }
