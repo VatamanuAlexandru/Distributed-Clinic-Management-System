@@ -1,0 +1,51 @@
+<section class="min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white py-24 px-6">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-400 mb-2">
+                Istoricul meu medical
+            </h2>
+        </div>
+
+        <div *ngIf="history.length === 0" class="text-center text-gray-600 dark:text-gray-400 text-lg">
+            Nu există înregistrări medicale.
+        </div>
+
+        <div *ngFor="let entry of history" (click)="goToDetails(entry)"
+            class="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl p-6 mb-6 transition-all duration-300">
+
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-2xl">
+                    {{ entry.type === 'DIAGNOSIS' ? '🩺' : '🧪' }}
+                </div>
+
+                <div class="flex-1">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">
+                        {{ entry.type === 'DIAGNOSIS' ? 'Diagnostic medical' : 'Test medical' }}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        {{ entry.date | date:'EEEE, d MMMM yyyy, HH:mm' }}
+                    </p>
+
+                    <div *ngIf="entry.type === 'DIAGNOSIS'" class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                        <p><strong>Boală:</strong> {{ entry.data.condition?.name }}</p>
+                        <p *ngIf="entry.data.condition?.symptoms?.length">
+                            <strong>Simptome:</strong> {{ getSymptomNames(entry.data.condition.symptoms) }}
+                        </p>
+                        <p *ngIf="entry.data.treatment">
+                            <strong>Tratament:</strong> {{ entry.data.treatment.treatmentType }} –
+                            {{ entry.data.treatment.details }}
+                        </p>
+                    </div>
+
+                    <div *ngIf="entry.type === 'TEST'" class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                        <p><strong>Test:</strong> {{ entry.data.testName }}</p>
+                        <p><strong>Categorie:</strong> {{ entry.data.category }}</p>
+                        <p><strong>Rezultat:</strong> {{ entry.data.result }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

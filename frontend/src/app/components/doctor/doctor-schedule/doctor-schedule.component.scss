@@ -1,0 +1,20 @@
+:host {
+    display: block;
+  }
+  
+  .relative > div[title] {
+    transition: background-color 0.3s ease;
+  }
+  
+  .relative > div[title]:hover {
+    background-color: #4f46e5; /* Indigo 600 hover */
+    box-shadow: 0 4px 8px rgb(79 70 229 / 0.4);
+  }
+  
+  @media print {
+    body * { visibility: hidden; }
+    .calendar-container, .calendar-container * { visibility: visible; }
+    .calendar-container { position: absolute; top: 0; left: 0; width: 100%; }
+    /* ascunde scrollbar, butoane, modale… */
+  }
+  

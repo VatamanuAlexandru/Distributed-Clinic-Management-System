@@ -1,5 +1,6 @@
 package com.clinic.user_service.configuration;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,6 +56,23 @@ public class Seeder implements CommandLineRunner {
 			admin.setPerson(new Person());
 			admin.setEnabled(true);
 			userRepository.save(admin);
+		}
+
+		Optional<User> doctorUser = userRepository.findByEmail("medic1@clinic.ro");
+		if (!doctorUser.isPresent()) {
+			User doctor = new User();
+			doctor.setEmail("medic1@clinic.ro");
+			doctor.setPassword(passwordEncoder.encode("alex123"));
+			doctor.setRoles(Set.of(doctorRole));
+
+			Person doctorPerson = new Person();
+			doctorPerson.setFirstName("Andrei");
+			doctorPerson.setLastName("Popescu");
+			doctorPerson.setPersonalId("1990101123456");
+			doctorPerson.setBirthdate(LocalDateTime.of(1990, 1, 11, 0, 0));
+			doctor.setPerson(doctorPerson);
+			doctor.setEnabled(true);
+			userRepository.save(doctor);
 		}
 
 	}

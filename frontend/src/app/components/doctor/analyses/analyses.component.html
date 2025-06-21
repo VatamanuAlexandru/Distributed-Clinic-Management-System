@@ -1,0 +1,228 @@
+<div #pdfContent
+    class="min-h-[90vh] w-full max-w-[1300px] mx-auto p-8 bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#23242b] rounded-2xl shadow-none transition-colors">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-[#6476fa]"></div>
+    </div>
+
+    <div *ngIf="error"
+        class="mb-4 p-4 bg-[#ffeaea] dark:bg-[#2a1d21] text-[#d14343] dark:text-[#ff8585] border border-[#ffd6d6] dark:border-[#3b2326] rounded-lg flex items-center">
+        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L10 9.586 7.707 7.293a1 1 0 00-1.414 1.414L8.586 11l-2.293 2.293a1 1 0 001.414 1.414L10 12.414l2.293 2.293a1 1 0 001.414-1.414L11.414 11l2.293-2.293z"
+                clip-rule="evenodd" />
+        </svg>
+        {{ error }}
+    </div>
+
+    <ng-container *ngIf="!selectedTest && !isLoading">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">Analize pacient</h2>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <div class="relative flex-1">
+                    <input [(ngModel)]="filter" (ngModelChange)="onFilterChange()" placeholder="Caută analize..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-[#6476fa] focus:border-transparent outline-none transition-all">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <button (click)="openTestModal()"
+                    class="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-800 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] font-medium transition-all shadow-none">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Adaugă analiză
+                </button>
+            </div>
+        </div>
+
+        <div
+            class="bg-white dark:bg-[#23242b] border border-gray-200 dark:border-[#292933] rounded-xl overflow-hidden shadow-none">
+            <app-table [columns]="testColumns" [data]="(filteredTests$ | async) ?? []"
+                [actions]="['view', 'edit', 'delete']" (action)="onTestAction($event)">
+            </app-table>
+        </div>
+
+        <pagination-controls (pageChange)="onPageChange($event)" class="flex justify-center mt-8"></pagination-controls>
+    </ng-container>
+
+    <ng-container *ngIf="selectedTest && !isLoading">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <button (click)="backToList()"
+                class="flex items-center gap-2 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-md border border-transparent hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Înapoi la listă
+            </button>
+            <div class="flex gap-2">
+                <button (click)="openTestModal(selectedTest)"
+                    class="flex items-center gap-1 px-4 py-1 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all shadow-none">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 4-2 2 v11a2 2 0 0 0 2 2 h11a2 2 0 0 0 2-2 v-5 m-1.414-9.414a2 2 0 1 1 2.828 2.828 L11.828 15 H9 v-2.828 l8.586-8.586 z" />
+                    </svg>
+                    Editare
+                </button>
+                <button (click)="exportPdf()"
+                    class="flex items-center gap-1 px-4 py-1 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all shadow-none">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h2.08a2 2 0 011.415.586l5.414 5.414A2 2 0 0117 10.92V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Export PDF
+                </button>
+            </div>
+        </div>
+        <div class="mb-8 bg-white dark:bg-[#23242b] p-6 rounded-xl border border-gray-200 dark:border-[#292933]">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ selectedTest.testName }}</h2>
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <p class="text-gray-500 dark:text-gray-300"><strong>Categorie:</strong> {{ selectedTest.category }}</p>
+                <p class="text-gray-500 dark:text-gray-300"><strong>Data:</strong> {{ selectedTest.testDate |
+                    date:'medium' }}</p>
+                <p class="text-gray-500 dark:text-gray-300"><strong>Rezultat:</strong> {{ selectedTest.result || 'N/A'
+                    }}</p>
+            </div>
+        </div>
+        <div class="mb-6 bg-white dark:bg-[#23242b] p-6 rounded-xl border border-gray-200 dark:border-[#292933]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">Parametri</h3>
+                <button (click)="openParamModal()"
+                    class="flex items-center gap-1 px-4 py-1 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all shadow-none">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Adaugă parametru
+                </button>
+            </div>
+            <app-table [columns]="paramColumns" [data]="selectedTest.parameterResults" [actions]="['edit', 'delete']"
+                (action)="onParamAction($event)"></app-table>
+        </div>
+    </ng-container>
+
+    <div *ngIf="showTestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div
+            class="bg-white dark:bg-[#181a20] rounded-2xl border border-gray-200 dark:border-[#23242b] shadow-lg p-8 w-full max-w-lg mx-4">
+            <div class="flex justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ editingTest ? 'Editează analiză' :
+                    'Adaugă analiză' }}</h3>
+                <button (click)="showTestModal = false"
+                    class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form [formGroup]="testForm" (ngSubmit)="saveTest()" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Denumire
+                        analiză</label>
+                    <input formControlName="testName"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    <p *ngIf="testForm.get('testName')?.invalid && testForm.get('testName')?.touched"
+                        class="text-red-500 text-xs mt-1">Denumirea analizei este obligatorie.</p>
+                </div>
+                <div>
+                    <label for="category"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categorie</label>
+                    <select formControlName="category"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa] appearance-none transition">
+                        <option *ngFor="let cat of testCategoryOptions" [ngValue]="cat.value">{{ cat.label }}</option>
+                    </select>
+                    <p *ngIf="testForm.get('category')?.invalid && testForm.get('category')?.touched"
+                        class="text-red-500 text-xs mt-1">Categoria este obligatorie.</p>
+                </div>
+                <div>
+                    <label for="testDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data
+                        analizei</label>
+                    <input type="date" formControlName="testDate"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    <p *ngIf="testForm.get('testDate')?.invalid && testForm.get('testDate')?.touched"
+                        class="text-red-500 text-xs mt-1">Data analizei este obligatorie.</p>
+                </div>
+                <div>
+                    <label for="result"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rezultat</label>
+                    <textarea formControlName="result"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" (click)="showTestModal = false"
+                        class="px-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-gray-100 dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-200 hover:dark:bg-[#25262e] transition-all">Anulează</button>
+                    <button type="submit"
+                        class="px-4 py-2 border border-[#6476fa] bg-[#6476fa] text-white rounded-lg font-semibold hover:bg-[#4356be] transition-all"
+                        [disabled]="testForm.invalid">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div *ngIf="showParamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div
+            class="bg-white dark:bg-[#181a20] rounded-2xl border border-gray-200 dark:border-[#23242b] shadow-lg p-8 w-full max-w-lg mx-4">
+            <div class="flex justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ editingParam ? 'Editează
+                    parametru' :
+                    'Adaugă parametru' }}</h3>
+                <button (click)="showParamModal = false"
+                    class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form [formGroup]="paramForm" (ngSubmit)="saveParam()" class="space-y-5">
+                <div>
+                    <label for="parameterName"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Denumire
+                        parametru</label>
+                    <input formControlName="parameterName"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    <p *ngIf="paramForm.get('parameterName')?.invalid && paramForm.get('parameterName')?.touched"
+                        class="text-red-500 text-xs mt-1">Denumirea parametrului este obligatorie.</p>
+                </div>
+                <div>
+                    <label for="value"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valoare</label>
+                    <input formControlName="value"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    <p *ngIf="paramForm.get('value')?.invalid && paramForm.get('value')?.touched"
+                        class="text-red-500 text-xs mt-1">Valoarea este obligatorie.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="unit"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unitate</label>
+                        <input formControlName="unit"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    </div>
+                    <div>
+                        <label for="referenceRange"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interval de
+                            referință</label>
+                        <input formControlName="referenceRange"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                    </div>
+                </div>
+                <div>
+                    <label for="notes"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observații</label>
+                    <textarea formControlName="notes"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" (click)="showParamModal = false"
+                        class="px-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-gray-100 dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-200 hover:dark:bg-[#25262e] transition-all">Anulează</button>
+                    <button type="submit"
+                        class="px-4 py-2 border border-[#6476fa] bg-[#6476fa] text-white rounded-lg font-semibold hover:bg-[#4356be] transition-all"
+                        [disabled]="paramForm.invalid">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

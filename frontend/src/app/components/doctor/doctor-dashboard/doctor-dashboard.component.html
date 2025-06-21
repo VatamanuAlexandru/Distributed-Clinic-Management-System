@@ -1,0 +1,100 @@
+<main class="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white px-6 py-10">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <header class="flex items-center justify-between mb-10">
+      <div class="flex items-center space-x-3">
+        <h1 class="text-2xl sm:text-3xl font-bold">Dashboard Medic</h1>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Bine ai venit!</span>
+      </div>
+      <span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
+        Ultima actualizare: acum 10 minute
+      </span>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <!-- Appointments Today -->
+      <article class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-calendar-day text-3xl text-indigo-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Programări astăzi</p>
+            <p class="text-2xl font-bold">9</p>
+            <p class="text-green-500 text-sm mt-1">↗ Activitate ridicată</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Completed Consultations -->
+      <article class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-user-clock text-3xl text-yellow-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Consultații finalizate</p>
+            <p class="text-2xl font-bold">134</p>
+            <p class="text-gray-400 text-sm mt-1">în ultima lună</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Upcoming Appointments -->
+      <article class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-clock text-3xl text-blue-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Programări viitoare</p>
+            <p class="text-2xl font-bold">15</p>
+            <p class="text-gray-400 text-sm mt-1">în următoarele 7 zile</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Active Patients -->
+      <article class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md border dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <i class="fa-solid fa-users text-3xl text-green-500"></i>
+          <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Pacienți activi</p>
+            <p class="text-2xl font-bold">56</p>
+            <p class="text-gray-400 text-sm mt-1">în acest moment</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Recent Activities Section -->
+    <section class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700 mb-10">
+      <h2 class="text-xl font-bold mb-4">Activități recente</h2>
+      <ul class="space-y-4">
+        <li class="flex items-center justify-between">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Consultație cu pacientul John Doe</span>
+          <span class="text-sm text-gray-400">acum 2 ore</span>
+        </li>
+        <li class="flex items-center justify-between">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Programare nouă adăugată</span>
+          <span class="text-sm text-gray-400">acum 1 zi</span>
+        </li>
+        <li class="flex items-center justify-between">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Raport medical generat</span>
+          <span class="text-sm text-gray-400">acum 3 zile</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Notifications Section -->
+    <section class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700">
+      <h2 class="text-xl font-bold mb-4">Notificări</h2>
+      <ul class="space-y-4">
+        <li class="flex items-center gap-4">
+          <i class="fa-solid fa-bell text-indigo-500"></i>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Pacientul Jane Smith a confirmat programarea</span>
+        </li>
+        <li class="flex items-center gap-4">
+          <i class="fa-solid fa-bell text-indigo-500"></i>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Raport medical disponibil pentru pacientul John
+            Doe</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>

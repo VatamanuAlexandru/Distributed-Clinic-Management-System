@@ -1,0 +1,65 @@
+<div class="p-4 max-w-2xl mx-auto">
+    <div *ngIf="isLoading" class="text-center py-8">Se încarcă...</div>
+    <div *ngIf="error" class="text-red-500">{{ error }}</div>
+
+    <!-- Lista de intrări -->
+    <ng-container *ngIf="!selected && !isLoading">
+        <h3 class="text-lg font-bold mb-4">Istoric medical pacient</h3>
+        <div *ngIf="entries.length === 0" class="text-gray-400">Nicio înregistrare găsită.</div>
+        <ul class="space-y-3">
+            <li *ngFor="let entry of entries">
+                <button (click)="viewDetails(entry)"
+                    class="w-full text-left border rounded-xl p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <div class="flex items-center gap-3">
+                        <span class="text-indigo-600 font-bold">{{ typeLabel(entry.type) }}</span>
+                        <span class="text-sm text-gray-500">{{ entry.date }}</span>
+                    </div>
+                    <div class="text-base text-gray-900 dark:text-gray-100 truncate">
+                        <ng-container *ngIf="entry.type === 'TEST'">
+                            {{ entry.data?.testName }}
+                        </ng-container>
+                        <ng-container *ngIf="entry.type === 'DIAGNOSIS'">
+                            {{ entry.data?.diagnosisName || entry.data?.name || 'Diagnostic' }}
+                        </ng-container>
+                    </div>
+                </button>
+            </li>
+        </ul>
+    </ng-container>
+
+    <!-- Detalii la click -->
+    <ng-container *ngIf="selected">
+        <button (click)="backToList()" class="mb-4 text-indigo-500 hover:underline flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Înapoi la listă
+        </button>
+        <div class="border rounded-xl p-6">
+            <h4 class="font-semibold text-lg mb-2">{{ typeLabel(selected.type) }} - {{ selected.date }}
+            </h4>
+            <ng-container *ngIf="selected.type === 'TEST'">
+                <div><b>Denumire:</b> {{ selected.data.testName }}</div>
+                <div><b>Categorie:</b> {{ selected.data.category }}</div>
+                <div><b>Rezultat:</b> {{ selected.data.result }}</div>
+                <div><b>Data:</b> {{ selected.data.testDate}}</div>
+                <!-- Poți adăuga parametri -->
+                <div *ngIf="selected.data.parameterResults?.length">
+                    <b>Parametri:</b>
+                    <ul class="ml-4">
+                        <li *ngFor="let p of selected.data.parameterResults">
+                            {{ p.parameterName }} = {{ p.value }} {{ p.unit }} <span class="text-gray-500">({{
+                                p.referenceRange }})</span>
+                        </li>
+                    </ul>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="selected.type === 'DIAGNOSIS'">
+                <div><b>Diagnostic:</b> {{ selected.data.name || selected.data.diagnosisName }}</div>
+                <div><b>Detalii:</b> {{ selected.data.details || '-' }}</div>
+                <div><b>Data diagnostic:</b> {{ selected.data.diagnosisDate }}</div>
+                <!-- Adaugă alte câmpuri relevante -->
+            </ng-container>
+        </div>
+    </ng-container>
+</div>

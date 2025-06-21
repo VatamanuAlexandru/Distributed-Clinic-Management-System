@@ -6,4 +6,6 @@ import com.clinic.patient.entity.Patient;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
+	Patient findByPersonId(Long patientId);
+
 }

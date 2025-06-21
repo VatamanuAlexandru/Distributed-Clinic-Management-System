@@ -1,9 +1,11 @@
 package com.clinic.patient.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.clinic.common.PersistableEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,9 +13,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -21,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MedicalTest extends PersistableEntity {
 	private static final long serialVersionUID = 1L;
 
@@ -38,11 +43,8 @@ public class MedicalTest extends PersistableEntity {
 	@Column(name = "RESULT", nullable = false)
 	private String result;
 
-//	@Column(name = "UNIT", nullable = true)
-//	private String unit;
-//
-//	@Column(name = "REFERENCE_RANGE", nullable = true)
-//	private String referenceRange;
+	@OneToMany(mappedBy = "medicalTest", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<TestParameterResult> parameterResults;
 
 	@Column(name = "TEST_DATE", nullable = false)
 	private LocalDateTime testDate;

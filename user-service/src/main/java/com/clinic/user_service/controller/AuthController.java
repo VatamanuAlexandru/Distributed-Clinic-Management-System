@@ -1,10 +1,14 @@
 package com.clinic.user_service.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clinic.mapper.ModelMapper;
-import com.clinic.user_service.client.PatientClient;
+import com.clinic.user_service.client.ClinicClient;
 import com.clinic.user_service.dto.AuthRequest;
 import com.clinic.user_service.dto.AuthResponse;
 import com.clinic.user_service.entity.Role;
@@ -42,10 +46,10 @@ public class AuthController {
 	private ModelMapper modelMapper;
 
 	@Autowired
-	private PatientClient patientClient;
-	
-	@Autowired
 	private RoleRepository roleRepository;
+
+	@Autowired
+	private ClinicClient clinicClient;
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
@@ -54,7 +58,8 @@ public class AuthController {
 					new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
 			User user = userService.findByEmail(authRequest.getEmail()).orElseThrow();
 			String token = jwtService.generateToken(user.getUsername());
-			return ResponseEntity.ok(new AuthResponse(token));
+			List<String> roleNames = user.getRoles().stream().map(role -> role.getName()).toList();
+			return ResponseEntity.ok(new AuthResponse(token, roleNames));
 		} catch (BadCredentialsException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(401).body("Invalid credentials");
@@ -69,13 +74,29 @@ public class AuthController {
 				.orElseThrow(() -> new RuntimeException("Default role PACIENT not found"));
 		user.getRoles().add(defaultRole);
 		User savedUser = userService.save(user);
-		patientClient.createPatient(savedUser.getPerson().getId());
+		clinicClient.createPatient(savedUser.getPerson().getId());
 		return ResponseEntity.ok(savedUser);
 	}
 
 	@GetMapping("/hello")
 	public String hello() {
 		return "Hello from User Service!";
+	}
+
+	@GetMapping("/currentPatientId")
+	public ResponseEntity<Long> getCurrentPatientId(@AuthenticationPrincipal UserDetails userDetails) {
+		User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+		Long personId = user.getPerson().getId();
+		Long patientId = clinicClient.getPatientIdByPersonId(personId);
+		return ResponseEntity.ok(patientId);
+	}
+
+	@GetMapping("/currentDoctorId")
+	public ResponseEntity<Long> getCurrentDoctorId(@AuthenticationPrincipal UserDetails userDetails) {
+		User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+		Long personId = user.getPerson().getId();
+		Long patientId = clinicClient.getDoctorIdByPersonId(personId);
+		return ResponseEntity.ok(patientId);
 	}
 
 }

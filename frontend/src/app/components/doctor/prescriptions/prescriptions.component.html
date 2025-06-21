@@ -1,0 +1,186 @@
+<div
+    class="p-8 min-h-screen bg-white dark:bg-[#181a20] border border-gray-200 dark:border-[#23242b] rounded-2xl shadow-none transition-colors">
+    <!-- Loader & Error -->
+    <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-[#6476fa]"></div>
+    </div>
+    <div *ngIf="error"
+        class="mb-4 p-4 bg-[#ffeaea] dark:bg-[#2a1d21] text-[#d14343] dark:text-[#ff8585] border border-[#ffd6d6] dark:border-[#3b2326] rounded-lg flex items-center">
+        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L10 9.586 7.707 7.293a1 1 0 00-1.414 1.414L8.586 11l-2.293 2.293a1 1 0 001.414 1.414L10 12.414l2.293 2.293a1 1 0 001.414-1.414L11.414 11l2.293-2.293z"
+                clip-rule="evenodd" />
+        </svg>
+        {{ error }}
+    </div>
+
+    <!-- Tratamente -->
+    <ng-container *ngIf="!selectedTreatment && !isLoading">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <h2 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">Tratamente pacient</h2>
+            <button (click="openTreatModal()"
+                class="px-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-800 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] font-medium transition-all shadow-none">
+                + Adaugă tratament
+            </button>
+        </div>
+        <div *ngIf="treatments.length === 0"
+            class="text-gray-500 dark:text-gray-400 italic py-12 text-center bg-white/70 dark:bg-[#23242b]/70 rounded-lg border border-dashed border-gray-200 dark:border-[#292933]">
+            Niciun tratament
+        </div>
+        <ol class="space-y-4">
+            <li *ngFor="let treat of treatments; trackBy: trackById"
+                class="bg-white dark:bg-[#23242b] border border-gray-200 dark:border-[#292933] rounded-xl shadow-sm p-5 flex justify-between items-center hover:shadow-md transition-all duration-200">
+                <div>
+                    <div class="font-semibold text-gray-900 dark:text-gray-100">{{ treat.treatmentType }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ treat.details }}</div>
+                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">Durată: {{ treat.duration || '-' }}</div>
+                </div>
+                <div class="flex gap-2">
+                    <button (click)="selectTreatment(treat)"
+                        class="px-3 py-1 border border-gray-200 dark:border-[#292933] rounded-md bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 hover:dark:bg-[#24252b] transition-colors duration-200">
+                        Detalii
+                    </button>
+                    <button (click)="openTreatModal(treat)"
+                        class="px-3 py-1 border border-gray-200 dark:border-[#292933] rounded-md bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 hover:dark:bg-[#24252b] transition-colors duration-200">
+                        Editează
+                    </button>
+                    <button (click)="deleteTreatment(treat.id)"
+                        class="px-3 py-1 border border-gray-200 dark:border-[#292933] rounded-md bg-white dark:bg-[#23242b] text-red-500 dark:text-red-400 font-medium hover:bg-gray-100 hover:dark:bg-[#24252b] transition-colors duration-200">
+                        Șterge
+                    </button>
+                </div>
+            </li>
+        </ol>
+    </ng-container>
+
+    <!-- Modal tratament -->
+    <div *ngIf="showTreatModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div
+            class="bg-white dark:bg-[#181a20] rounded-2xl border border-gray-200 dark:border-[#23242b] shadow-lg p-8 w-full max-w-md mx-4">
+            <div class="flex justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ treatEditData ? 'Editare
+                    tratament' : 'Adaugă tratament' }}</h3>
+                <button (click)="closeTreatModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form [formGroup]="treatForm" (ngSubmit)="saveTreatment()" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tip tratament</label>
+                    <input formControlName="treatmentType" placeholder="Tip tratament"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Detalii</label>
+                    <textarea formControlName="details" placeholder="Detalii"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Durată</label>
+                    <input formControlName="duration" placeholder="Durată"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-[#292933] rounded-lg bg-gray-50 dark:bg-[#23242b] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-[#6476fa]" />
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" (click)="closeTreatModal()"
+                        class="px-4 py-2 border border-gray-200 dark:border-[#292933] rounded-lg bg-gray-100 dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-200 hover:dark:bg-[#25262e] transition-all">Anulează</button>
+                    <button type="submit" [disabled]="treatForm.invalid"
+                        class="px-4 py-2 border border-[#6476fa] bg-[#6476fa] text-white rounded-lg font-semibold hover:bg-[#4356be] transition-all">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Detalii tratament & medicamente -->
+    <div *ngIf="selectedTreatment" class="max-w-3xl mx-auto">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <button (click)="deselectTreatment()"
+                class="flex items-center gap-2 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-md border border-transparent hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Înapoi
+            </button>
+        </div>
+        <div class="mb-8 bg-white dark:bg-[#23242b] p-6 rounded-xl border border-gray-200 dark:border-[#292933]">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ selectedTreatment.treatmentType
+                }}</h2>
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <p class="text-gray-500 dark:text-gray-300"><strong>Detalii:</strong> {{ selectedTreatment.details }}
+                </p>
+                <p class="text-gray-500 dark:text-gray-300"><strong>Durată:</strong> {{ selectedTreatment.duration ||
+                    'N/A' }}</p>
+            </div>
+        </div>
+        <div class="mb-6 bg-white dark:bg-[#23242b] p-6 rounded-xl border border-gray-200 dark:border-[#292933]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">Medicamente asociate</h3>
+                <button (click)="addExpandMedication()"
+                    class="px-4 py-1 border border-gray-200 dark:border-[#292933] rounded-lg bg-white dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-100 hover:dark:bg-[#24252b] transition-all shadow-none">
+                    + Adaugă medicament
+                </button>
+            </div>
+            <div *ngIf="medications.length === 0"
+                class="text-gray-400 italic py-6 text-center bg-white/70 dark:bg-[#23242b]/70 rounded-lg border border-dashed border-gray-200 dark:border-[#292933]">
+                Nu există medicamente.
+            </div>
+            <ul>
+                <li *ngFor="let med of medications; let idx = index; trackBy: trackById" class="mb-4">
+                    <div
+                        class="rounded-xl border border-gray-200 dark:border-[#292933] shadow-sm bg-gray-50 dark:bg-[#23242b] p-4 group relative transition-all duration-200 hover:bg-gray-100 dark:hover:bg-[#24252b]/70">
+                        <!-- Card HEADER (click pt expand/collapse) -->
+                        <div class="flex items-center justify-between cursor-pointer"
+                            (click)="toggleExpandMedication(idx)">
+                            <div class="flex flex-col">
+                                <span class="font-medium text-gray-900 dark:text-gray-100">{{ med.name }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ med.dosage }}, {{
+                                    med.frequency }}, {{ med.administrationRoute }}</span>
+                                <span *ngIf="med.sideEffects" class="text-xs text-gray-400 dark:text-gray-500">Efecte:
+                                    {{ med.sideEffects }}</span>
+                            </div>
+                            <span
+                                class="material-icons text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-transform"
+                                [class.rotate-180]="expandedMedication === idx">expand_more</span>
+                        </div>
+                        <!-- EDIT COLLAPSE -->
+                        <form *ngIf="expandedMedication === idx" [formGroup]="editMedForms[idx]"
+                            (ngSubmit)="saveMedication(idx)"
+                            class="mt-4 border-t border-gray-200 dark:border-[#292933] pt-4 space-y-3">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input formControlName="name" placeholder="Nume"
+                                    class="flex-1 border border-gray-300 dark:border-[#292933] rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-[#23242b] focus:ring-1 focus:ring-[#6476fa]" />
+                                <input formControlName="dosage" placeholder="Dozaj"
+                                    class="w-36 border border-gray-300 dark:border-[#292933] rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-[#23242b] focus:ring-1 focus:ring-[#6476fa]" />
+                                <input formControlName="frequency" placeholder="Frecvență"
+                                    class="w-36 border border-gray-300 dark:border-[#292933] rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-[#23242b] focus:ring-1 focus:ring-[#6476fa]" />
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input formControlName="administrationRoute" placeholder="Administrare"
+                                    class="flex-1 border border-gray-300 dark:border-[#292933] rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-[#23242b] focus:ring-1 focus:ring-[#6476fa]" />
+                                <input formControlName="sideEffects" placeholder="Efecte adverse"
+                                    class="flex-1 border border-gray-300 dark:border-[#292933] rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-[#23242b] focus:ring-1 focus:ring-[#6476fa]" />
+                            </div>
+                            <div class="flex gap-3 mt-3">
+                                <button type="submit" [disabled]="editMedForms[idx].invalid"
+                                    class="px-5 py-2 border border-[#6476fa] bg-[#6476fa] text-white rounded-md font-semibold hover:bg-[#4356be] transition-colors duration-200">
+                                    Salvează
+                                </button>
+                                <button type="button" (click)="cancelEditMedication(idx)"
+                                    class="px-5 py-2 border border-gray-200 dark:border-[#292933] rounded-md bg-gray-100 dark:bg-[#23242b] text-gray-700 dark:text-gray-100 hover:bg-gray-200 hover:dark:bg-[#25262e] transition-colors duration-200">
+                                    Renunță
+                                </button>
+                                <button type="button" (click)="deleteMedication(med)"
+                                    class="ml-auto px-5 py-2 border border-gray-200 dark:border-[#292933] rounded-md bg-white dark:bg-[#23242b] text-red-500 dark:text-red-400 font-medium hover:bg-gray-100 hover:dark:bg-[#24252b] transition-colors duration-200">
+                                    Șterge
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

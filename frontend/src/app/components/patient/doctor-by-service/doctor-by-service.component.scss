@@ -1,0 +1,11 @@
+.event-slot {
+  --smart-scheduler-event-background: #3b82f6;
+  --smart-scheduler-event-hover: #2563eb;
+  --smart-scheduler-event-focus: #1d4ed8;
+}
+
+::ng-deep .fc-timegrid-body {
+  max-height: 500px;
+  /* ajustează după nevoi */
+  overflow-y: auto;
+}

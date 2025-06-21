@@ -1,0 +1,142 @@
+<section class="max-w-7xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl relative">
+    <h2 class="text-4xl font-extrabold mb-4 text-center text-gray-900 dark:text-white tracking-wide">
+        Programul meu de lucru
+    </h2>
+
+    <!-- Navigare săptămâni -->
+    <div class="flex items-center justify-between mb-4 px-2 md:px-0">
+        <button (click)="prevWeek()" aria-label="Săptămâna anterioară"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+            <!-- left arrow svg -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="text-lg font-medium text-gray-800 dark:text-gray-200">
+            {{ weekLabel }}
+        </div>
+        <button (click)="nextWeek()" aria-label="Săptămâna următoare"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
+            <!-- right arrow svg -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="overflow-auto rounded-lg bg-gray-50 dark:bg-gray-800 relative scrollbar-thin scrollbar-thumb-indigo-400 scrollbar-track-transparent"
+        [style.max-height.px]="hours.length * hourHeightPx + hourHeightPx + 60">
+        <!-- Header zile -->
+        <div
+            class="grid grid-cols-7 text-center text-gray-700 dark:text-gray-300 font-semibold select-none mb-3 bg-gray-100 dark:bg-gray-900 sticky top-0 z-20 rounded-t-lg">
+            <div *ngFor="let d of weekDays" class="px-4 py-2 relative">
+                <div [ngClass]="{'bg-indigo-100 dark:bg-indigo-800 rounded': isToday(d.date), 'bg-gray-200 dark:bg-gray-700': [0,6].includes(d.date.getDay())}"
+                    class="absolute inset-0 -z-10"></div>
+                <span [ngClass]="{'text-indigo-600 dark:text-indigo-400': isToday(d.date)}">
+                    {{ d.label }} <span class="text-sm">{{ d.date | date:'dd MMM' }}</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Grid zile & ore -->
+        <div class="relative" [style.min-height.px]="hours.length * hourHeightPx + hourHeightPx">
+            <!-- Liniile orare -->
+            <ng-container *ngFor="let hour of hours; let i=index">
+                <div class="absolute inset-x-0 border-t border-gray-200 dark:border-gray-700 opacity-50"
+                    [style.top.px]="i*hourHeightPx + hourHeightPx"></div>
+            </ng-container>
+
+            <!-- Calendar cu ore și zile -->
+            <div class="grid grid-cols-[40px_repeat(7,1fr)] h-full">
+                <!-- Sidebar ore -->
+                <div class="flex flex-col text-gray-600 dark:text-gray-400 text-xs select-none font-mono">
+                    <div
+                        class="h-10 leading-10 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 sticky top-0">
+                        Ore</div>
+                    <ng-container *ngFor="let hour of hours">
+                        <div class="h-10 leading-10 border-b border-gray-200 dark:border-gray-700">{{ hour }}:00</div>
+                    </ng-container>
+                </div>
+                <!-- Coloane zile -->
+                <div class="col-span-7 relative">
+                    <div class="grid grid-cols-7 h-full relative">
+                        <div *ngFor="let d of weekDays" class="relative border-l border-gray-200 dark:border-gray-700">
+                            <ng-container *ngFor="let schedule of schedulesByDay(d.day)">
+                                <div role="button" tabindex="0"
+                                    class="absolute inset-x-1 bg-gradient-to-r from-indigo-600/90 to-indigo-500/90 text-white text-xs font-semibold shadow-lg transition-transform hover:scale-105 hover:shadow-xl rounded-lg flex justify-between items-center p-2"
+                                    [style.top.px]="timeToPixels(schedule.startTime)"
+                                    [style.height.px]="durationToPixels(schedule.startTime, schedule.endTime)"
+                                    (click)="openEditScheduleModal(schedule)">
+                                    <span>{{ schedule.startTime }} - {{ schedule.endTime }}</span>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Enterprise Design -->
+    <div *ngIf="modalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-xl animate-fade-in-up">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+                    {{ editingSchedule ? 'Editează interval de lucru' : 'Adaugă interval de lucru' }}
+                </h3>
+                <button (click)="closeModal()" aria-label="Închide" class="text-gray-500 hover:text-red-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Form Enterprise -->
+            <form (ngSubmit)="saveSchedule()" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ziua</label>
+                        <select [(ngModel)]="form.dayOfWeek" name="dayOfWeek" required
+                            class="w-full py-3 px-4 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-700 transition">
+                            <option *ngFor="let opt of dayOptions" [value]="opt.value">{{ opt.label }}</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Interval
+                            orar</label>
+                        <div class="flex space-x-4">
+                            <input type="time" [(ngModel)]="form.startTime" name="startTime" required
+                                class="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-700 transition" />
+                            <input type="time" [(ngModel)]="form.endTime" name="endTime" required
+                                class="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-700 transition" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Actions -->
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" (click)="closeModal()"
+                        class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        Anulează
+                    </button>
+                    <button type="submit"
+                        class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg transition-transform hover:scale-105">
+                        Salvează
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Buton flotant modern -->
+    <button (click)="openAddScheduleModal()"
+        class="fixed bottom-8 right-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-2xl hover:shadow-inner transition-transform hover:scale-110 z-30"
+        aria-label="Adaugă interval">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 transform rotate-45" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+</section>

@@ -48,7 +48,8 @@ public class ModelMapper {
 		}
 		try {
 			T entity = entityClass.getDeclaredConstructor().newInstance();
-			BeanUtils.copyProperties(dto, entity);
+//			List<String> excludedFields = getExcludedFields(dto.getClass());
+			BeanUtils.copyProperties(entity, dto);
 			mapComplexFields(dto, entity, true);
 			return entity;
 		} catch (Exception e) {
@@ -128,8 +129,9 @@ public class ModelMapper {
 	}
 
 	private List<Field> getComplexFields(Class<?> clazz) {
-		return Arrays.stream(clazz.getDeclaredFields())
-				.filter(field -> !field.getType().isPrimitive() && !field.getType().getName().startsWith("java."))
+		return Arrays
+				.stream(clazz.getDeclaredFields()).filter(field -> !field.getType().isPrimitive()
+						&& !field.getType().getName().startsWith("java.") && !field.getType().isEnum())
 				.collect(Collectors.toList());
 	}
 }

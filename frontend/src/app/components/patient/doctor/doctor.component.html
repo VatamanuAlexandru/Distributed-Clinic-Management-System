@@ -1,0 +1,52 @@
+<section
+  class="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-800 dark:text-white pt-24 pb-16 transition-colors duration-300">
+  <div class="max-w-screen-xl mx-auto px-4">
+    <h2 class="text-3xl font-semibold mb-10 text-center text-blue-900 dark:text-white">Medici disponibili</h2>
+
+    <div class="mb-10 max-w-md mx-auto">
+      <app-select-single [label]="'Alege departamentul'" [items]="departments" [selectedId]="selectedDepartmentId"
+        (selectedChange)="onDepartmentSelected($event)">
+      </app-select-single>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div *ngFor="let doctor of doctors"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all">
+        <div class="flex justify-end px-4 pt-4">
+          <button class="text-gray-400 hover:text-gray-600 dark:hover:text-white">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 3">
+              <path
+                d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col items-center p-6">
+          <img class="w-20 h-20 mb-4 rounded-full border-2 border-blue-100 dark:border-gray-600 shadow"
+            [src]="'https://ui-avatars.com/api/?name=' + doctor.person.firstName + '+' + doctor.person.lastName + '&background=edf2f7&color=2b6cb0'"
+            alt="Avatar">
+          <h5 class="text-lg font-medium text-gray-900 dark:text-white text-center">
+            {{ doctor.person.lastName }} {{ doctor.person.firstName }}
+          </h5>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {{ doctor.medicalTitle?.name || 'Fără titlu' }}
+          </p>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            {{ doctor.yearsOfExperience || 0 }} ani experiență
+          </p>
+          <div class="flex mt-4 gap-2">
+            <button class="px-4 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 transition"
+              (click)="viewProfile(doctor.id)">
+              Profil
+            </button>
+
+            <button
+              class="px-4 py-1.5 text-sm text-blue-700 dark:text-blue-300 border border-blue-600 dark:border-blue-400 rounded hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+              Contact
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

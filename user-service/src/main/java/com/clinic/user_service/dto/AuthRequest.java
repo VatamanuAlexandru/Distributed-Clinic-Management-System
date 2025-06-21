@@ -10,6 +10,7 @@ public class AuthRequest extends BaseRecord {
 	private String email;
 	@ExcludeMapping
 	private String password;
+	@ExcludeMapping
 	private PersonRecord person;
 
 	public String getEmail() {

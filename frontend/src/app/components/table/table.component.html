@@ -1,0 +1,70 @@
+<!-- table.component.html -->
+<div class="relative overflow-x-auto shadow-lg rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700">
+    <table class="w-full text-[15px] text-left text-gray-700 dark:text-gray-300">
+        <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800">
+            <tr>
+                <th *ngFor="let col of columns" (click)="onSort(col.key)" [class.cursor-pointer]="true"
+                    class="px-6 py-3 font-semibold whitespace-nowrap select-none">
+                    <div class="flex items-center gap-1">
+                        <span>{{ col.label }}</span>
+                        <svg *ngIf="sortColumn === col.key" class="w-3.5 h-3.5 transition-transform" fill="none"
+                            stroke="currentColor" stroke-width="2"
+                            [ngClass]="{ 'rotate-180': sortDirection === 'desc' }" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                        </svg>
+                    </div>
+                </th>
+                <th *ngIf="actions.length" class="px-6 py-3 text-right font-semibold whitespace-nowrap">
+                    Acțiuni
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of paginatedData()" [ngClass]="rowClassFunction ? rowClassFunction(row) : ''"
+                class="transition ease-in-out hover:shadow-md odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900 dark:even:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <td *ngFor="let col of columns" class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                    {{ row[col.key] }}
+                </td>
+                <td *ngIf="actions.length" class="px-6 py-4 text-sm text-right">
+                    <ng-container *ngFor="let act of actions">
+                        <button (click)="action.emit({ type: act, row })"
+                            [attr.aria-label]="'Acțiune: ' + (act | titlecase)"
+                            class="mx-1 inline-flex items-center justify-center p-2 rounded-md text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 transition">
+                            <ng-container [ngSwitch]="act">
+                                <svg *ngSwitchCase="'vezi'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span *ngSwitchDefault class="capitalize">{{ act }}</span>
+                            </ng-container>
+                        </button>
+                    </ng-container>
+                </td>
+            </tr>
+            <tr *ngIf="!data?.length">
+                <td [attr.colspan]="columns.length + (actions.length ? 1 : 0)"
+                    class="px-6 py-6 text-center text-gray-500 dark:text-gray-400">
+                    Nu există date de afișat.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="flex justify-between items-center px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+        <span>Pagina {{ currentPage + 1 }} din {{ totalPages() }}</span>
+        <div class="space-x-2">
+            <button (click)="prevPage()" [disabled]="currentPage === 0"
+                class="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">
+                ‹ Anterior
+            </button>
+            <button (click)="nextPage()" [disabled]="(currentPage + 1) * pageSize >= data.length"
+                class="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">
+                Următor ›
+            </button>
+        </div>
+    </div>
+</div>

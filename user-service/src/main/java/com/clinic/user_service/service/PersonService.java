@@ -32,24 +32,27 @@ public class PersonService extends BaseService<Person> {
 				.orElseThrow(() -> new IllegalArgumentException("Person not found with ID: " + personId));
 		PersonRecord personRecord = modelMapper.convertToDto(person, PersonRecord.class);
 
-		ContactInfoRecord contanctInfoRecord = new ContactInfoRecord();
-		contanctInfoRecord.setEmailAddress(person.getContactInfo().getEmailAddress());
-		contanctInfoRecord.setPhoneNumber(person.getContactInfo().getPhoneNumber());
+		if (person.getContactInfo() != null) {
+			ContactInfoRecord contanctInfoRecord = new ContactInfoRecord();
+			contanctInfoRecord.setEmailAddress(person.getContactInfo().getEmailAddress());
+			contanctInfoRecord.setPhoneNumber(person.getContactInfo().getPhoneNumber());
+			personRecord.setContactInfo(contanctInfoRecord);
+		}
 
-		AddressInfoRecord addressInfoRecord = new AddressInfoRecord();
-		AddressInfo serverAddressInfo = person.getAddressInfo();
-		addressInfoRecord.setBuilding(serverAddressInfo.getBuilding());
-		addressInfoRecord.setCity(serverAddressInfo.getCity());
-		addressInfoRecord.setCountry(serverAddressInfo.getCountry());
-		addressInfoRecord.setCounty(serverAddressInfo.getCounty());
-		addressInfoRecord.setEntrance(serverAddressInfo.getEntrance());
-		addressInfoRecord.setFlatNumer(serverAddressInfo.getFlatNumer());
-		addressInfoRecord.setPostalCode(serverAddressInfo.getPostalCode());
-		addressInfoRecord.setStreetName(serverAddressInfo.getStreetName());
-		addressInfoRecord.setStreetNumber(serverAddressInfo.getStreetNumber());
-
-		personRecord.setAddressInfo(addressInfoRecord);
-		personRecord.setContactInfo(contanctInfoRecord);
+		if (person.getAddressInfo() != null) {
+			AddressInfoRecord addressInfoRecord = new AddressInfoRecord();
+			AddressInfo serverAddressInfo = person.getAddressInfo();
+			addressInfoRecord.setBuilding(serverAddressInfo.getBuilding());
+			addressInfoRecord.setCity(serverAddressInfo.getCity());
+			addressInfoRecord.setCountry(serverAddressInfo.getCountry());
+			addressInfoRecord.setCounty(serverAddressInfo.getCounty());
+			addressInfoRecord.setEntrance(serverAddressInfo.getEntrance());
+			addressInfoRecord.setFlatNumer(serverAddressInfo.getFlatNumer());
+			addressInfoRecord.setPostalCode(serverAddressInfo.getPostalCode());
+			addressInfoRecord.setStreetName(serverAddressInfo.getStreetName());
+			addressInfoRecord.setStreetNumber(serverAddressInfo.getStreetNumber());
+			personRecord.setAddressInfo(addressInfoRecord);
+		}
 
 		return personRecord;
 	}

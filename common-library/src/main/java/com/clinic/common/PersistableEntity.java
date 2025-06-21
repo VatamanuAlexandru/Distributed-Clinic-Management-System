@@ -40,7 +40,6 @@ public class PersistableEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ID")
 	protected Long id;
 
 	@Version

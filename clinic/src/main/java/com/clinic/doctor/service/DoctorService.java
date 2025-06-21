@@ -8,12 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.clinic.appointment.entity.Appointment;
+import com.clinic.appointment.entity.AppointmentStatus;
+import com.clinic.appointment.repository.AppointmentRepository;
 import com.clinic.client.PersonClient;
 import com.clinic.common.service.BaseService;
 import com.clinic.doctor.dto.DoctorRecord;
 import com.clinic.doctor.entity.Doctor;
 import com.clinic.doctor.repository.DoctorRepository;
 import com.clinic.mapper.ModelMapper;
+import com.clinic.patient.dto.PatientRecord;
 
 @Service
 public class DoctorService extends BaseService<Doctor> {
@@ -26,6 +30,9 @@ public class DoctorService extends BaseService<Doctor> {
 
 	@Autowired
 	private PersonClient personClient;
+	
+	@Autowired
+	private AppointmentRepository appointmentRepository;
 
 	@Override
 	protected JpaRepository<Doctor, Long> getRepository() {
@@ -101,5 +108,18 @@ public class DoctorService extends BaseService<Doctor> {
 
 		return doctorRecords;
 	}
+	
+	public List<PatientRecord> getCompletedPatientsByDoctor(Long doctorId) {
+		List<Appointment> appts = appointmentRepository.findByDoctorIdAndStatus(doctorId, AppointmentStatus.COMPLETED);
+
+		return appts.stream().map(Appointment::getPatient).distinct().map(patientEntity -> {
+			PatientRecord pr = modelMapper.convertToDto(patientEntity, PatientRecord.class);
+			var personDto = personClient.getPersonById(patientEntity.getPersonId());
+			pr.setPerson(personDto);
+			return pr;
+		}).collect(Collectors.toList());
+	}
+
+
 
 }

@@ -1,5 +1,7 @@
 package com.clinic.patient.dto;
 
+import java.util.List;
+
 import com.clinic.common.dto.PersonRecord;
 import com.clinic.mapper.BaseRecord;
 import com.clinic.mapper.ExcludeMapping;
@@ -16,5 +18,6 @@ public class PatientRecord extends BaseRecord {
 	private PersonRecord person;
 
 	private InsuranceRecord insuranceRecord;
+	private List<MedicalHistoryRecord> medicalHistories;
 
 }

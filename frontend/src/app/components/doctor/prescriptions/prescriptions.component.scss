@@ -1,0 +1,14 @@
+:host {
+
+    input,
+    textarea,
+    button {
+        outline: none;
+        transition: background 0.15s, border 0.15s;
+    }
+
+    button[disabled] {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+}

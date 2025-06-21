@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
-import {HttpClientModule} from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 
 @Component({
   selector: 'app-login',
@@ -41,16 +41,27 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (res) => {
           this.authService.saveToken(res.token);
-          console.log("sd");
-          this.router.navigate(['/dashboard']);
+          this.authService.saveRoles(res.roles);
+          console.log(res.roles);
+
+          const roles = res.roles;
+
+          if (roles.includes('PACIENT')) {
+            this.router.navigate(['/patient']);
+          } else if (roles.includes('ADMIN')) {
+            this.router.navigate(['/admin']);
+          } else if (roles.includes('DOCTOR')) {
+            this.router.navigate(['/doctor']);
+          } else {
+            this.router.navigate(['/login']);
+          }          
         },
         error: (err) => {
           this.errorMessage = 'Invalid credentials';
           console.error(err);
         }
       });
-    } else {
-      this.loginForm.markAllAsTouched();
+      // this.loginForm.markAllAsTouched();
     }
   }
 }

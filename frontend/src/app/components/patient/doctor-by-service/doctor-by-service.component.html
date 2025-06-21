@@ -1,0 +1,155 @@
+<section
+    class="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-800 dark:text-white pt-32 pb-24 transition-colors duration-300">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center text-blue-900 dark:text-white tracking-tight">
+            Medici pentru serviciul selectat
+        </h2>
+
+        <div class="space-y-6" *ngIf="doctors.length > 0">
+            <div *ngFor="let doctor of doctors"
+                class="flex flex-col sm:flex-row items-center sm:items-start bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl p-6 gap-6 transition-all duration-300">
+                <img class="w-28 h-28 rounded-full border-4 border-blue-200 dark:border-blue-700 shadow"
+                    [src]="'https://ui-avatars.com/api/?name=' + doctor.person.firstName + '+' + doctor.person.lastName + '&background=edf2f7&color=2b6cb0'"
+                    alt="Avatar" />
+
+                <div class="flex flex-col items-center sm:items-start text-center sm:text-left flex-1">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1 leading-snug tracking-tight">
+                        {{ doctor.person.lastName }} {{ doctor.person.firstName }}
+                    </h3>
+                    <span *ngIf="doctor.medicalTitle?.name"
+                        class="mt-1 inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                        {{ doctor.medicalTitle.name }}
+                    </span>
+                    <div class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path
+                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.785.57-1.84-.197-1.54-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
+                        </svg>
+                        <span class="font-medium">{{ doctor.yearsOfExperience || 0 }}</span> ani experiență
+                    </div>
+                </div>
+                <button class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow transition"
+                    (click)="openScheduleModal(doctor.id)">
+                    Programează-te
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-16 text-center">
+            <button
+                class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold rounded-lg shadow-lg transition duration-200"
+                (click)="back()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Înapoi la servicii
+            </button>
+        </div>
+    </div>
+</section>
+
+<div *ngIf="selectedDoctorId" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div
+        class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-3xl shadow-2xl w-[98%] max-w-6xl max-h-[92vh] overflow-y-auto p-8 border border-gray-200 dark:border-gray-700 transition-all duration-300">
+
+        <h2 class="text-4xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400 tracking-tight">
+            Programare la medic
+        </h2>
+
+        <div class="mb-6 text-center text-sm text-gray-700 dark:text-gray-300">
+            <p><strong>Medic:</strong> {{ selectedDoctor?.person.firstName }} {{ selectedDoctor?.person.lastName }} ({{
+                selectedDoctor?.medicalTitle?.name }})</p>
+            <p *ngIf="selectedDoctor?.office"><strong>Cabinet:</strong> {{ selectedDoctor?.office.name }}, {{
+                selectedDoctor?.office.floor }}</p>
+            <p *ngIf="selectedDoctor?.yearsOfExperience"><strong>Experiență:</strong>
+                {{selectedDoctor?.yearsOfExperience }}
+                ani</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Selectează ziua
+                    dorită</label>
+                <input type="date" (change)="onDateSelected($event)"
+                    class="w-full p-2 border rounded-lg bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white shadow-inner" />
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Selectează o zi și apoi un interval liber.
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-teal-400 rounded-sm border border-gray-300 dark:border-gray-600"></div> Liber
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-red-400 rounded-sm border border-gray-300 dark:border-gray-600"></div> Ocupat
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-blue-600 rounded-sm border border-gray-300 dark:border-gray-600"></div> Selectat
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xl">
+            <full-calendar #calendar [options]="calendarOptions" class="p-4 text-sm"></full-calendar>
+        </div>
+
+        <div *ngIf="selectedSlot"
+            class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-400 dark:border-blue-600">
+            <p class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                Ai selectat programarea pentru: <span class="font-semibold">{{ selectedSlot | date:'EEEE, d MMMM yyyy,
+                    HH:mm' }}</span>
+            </p>
+        </div>
+
+        <!-- Motivul -->
+        <div *ngIf="selectedSlot" class="mt-4">
+            <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Motivul programării</label>
+            <input type="text" [(ngModel)]="appointmentReason"
+                class="w-full p-3 border rounded-lg bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white shadow-inner"
+                placeholder="Ex: consultație generală..." />
+        </div>
+
+        <!-- Observații -->
+        <div *ngIf="selectedSlot" class="mt-4">
+            <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Observații</label>
+            <textarea [(ngModel)]="appointmentNotes"
+                class="w-full p-3 border rounded-lg bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white shadow-inner"
+                placeholder="Detalii suplimentare pentru medic (opțional)..." rows="3"></textarea>
+        </div>
+
+        <!-- Butoane -->
+        <div class="flex justify-between items-center mt-8">
+            <button class="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                (click)="selectedDoctorId = null">Închide</button>
+            <button class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+            text-white text-sm font-semibold rounded-lg shadow-lg transition duration-200"
+                [disabled]="!selectedSlot || !appointmentReason.trim()" (click)="confirmAppointment()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Confirmă programarea
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Mesaje de feedback globale -->
+<!-- Toast Feedback - Bottom of Page -->
+<div *ngIf="hasFeedback()" class="fixed bottom-6 inset-x-0 flex justify-center z-50">
+    <div *ngIf="successMessage"
+        class="max-w-2xl w-full mx-4 px-6 py-4 text-sm text-green-900 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-100 shadow-lg animate-fade-in">
+        {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage"
+        class="max-w-2xl w-full mx-4 px-6 py-4 text-sm text-red-900 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-100 shadow-lg animate-fade-in">
+        {{ errorMessage }}
+    </div>
+</div>
