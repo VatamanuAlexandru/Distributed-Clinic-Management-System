@@ -1,6 +1,8 @@
 package com.clinic.user_service.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clinic.mapper.ModelMapper;
@@ -97,6 +100,21 @@ public class AuthController {
 		Long personId = user.getPerson().getId();
 		Long patientId = clinicClient.getDoctorIdByPersonId(personId);
 		return ResponseEntity.ok(patientId);
+	}
+
+	@GetMapping("/getEmailAndUserIdByPersonId")
+	public ResponseEntity<Map<String, Object>> getEmailAndUserIdByPersonId(@RequestParam Long personId) {
+		User user = userService.findByPersonId(personId).orElseThrow();
+		Map<String, Object> map = new HashMap<>();
+		map.put("userId", user.getId());
+		map.put("email", user.getEmail());
+		return ResponseEntity.ok(map);
+	}
+
+	@GetMapping("/currentUserId")
+	public ResponseEntity<Long> getCurrentUserId(@AuthenticationPrincipal UserDetails userDetails) {
+		User user = userService.findByEmail(userDetails.getUsername()).orElseThrow();
+		return ResponseEntity.ok(user.getId());
 	}
 
 }

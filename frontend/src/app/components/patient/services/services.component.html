@@ -1,25 +1,95 @@
 <section
     class="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-800 dark:text-white pt-28 pb-20 transition-colors duration-300">
     <div class="max-w-screen-xl mx-auto px-4">
-        <h2 class="text-4xl font-bold mb-12 text-center text-blue-900 dark:text-white tracking-tight">
+
+        <h2 class="text-4xl font-bold mb-3 text-center text-blue-900 dark:text-white tracking-tight">
             Servicii medicale disponibile
         </h2>
-
-        <div class="mb-10 max-w-md mx-auto">
-            <app-select-single [label]="'Alege specializarea'" [items]="departments" [selectedId]="selectedDepartmentId"
-                (selectedChange)="onDepartmentSelected($event)">
-            </app-select-single>
+        <div class="mb-10 text-center max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-300">
+            Alege specializarea dorită și descoperă toate serviciile medicale oferite de clinica noastră.<br>
+            Toate serviciile sunt prestate de medici cu experiență, în condiții premium.
+        </div>
+        <div class="flex justify-center mb-6">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-700 dark:text-blue-200 text-base shadow">
+                <span class="material-icons text-lg"></span>
+                <span>Poți filtra rapid serviciile după specializare sau poți naviga printre toate.</span>
+            </div>
         </div>
 
+        <div class="flex flex-wrap gap-2 justify-center mb-8 text-xs">
+            <div *ngFor="let dept of [
+                {label:'Pediatrie', c:'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'},
+                {label:'Dermatologie', c:'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'},
+                {label:'Cardiologie', c:'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'},
+                {label:'Ginecologie', c:'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'},
+                {label:'ORL', c:'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'},
+                {label:'Psihologie', c:'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'},
+                {label:'Altele', c:'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}
+            ]" class="flex items-center gap-1">
+                <span class="inline-block w-4 h-4 rounded-full" [ngClass]="dept.c"></span> {{ dept.label }}
+            </div>
+        </div>
+
+        <div class="mb-10 max-w-md mx-auto">
+            <app-select-single
+              [label]="'Alege specializarea'"
+              [items]="departments"
+              [selectedId]="selectedDepartmentId"
+              (selectedChange)="onDepartmentSelected($event)">
+            </app-select-single>
+          </div>
+          
+
+        <div class="mb-6 text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
+            <span class="inline-block bg-gray-100 dark:bg-gray-800 px-4 py-1 rounded-xl">
+                <b>{{ services?.length || 0 }}</b> servicii afișate
+                <ng-container *ngIf="selectedDepartmentId; else allDepts">
+                    &bull; Filtru activ:
+                    <span class="font-semibold text-blue-600 dark:text-blue-400">
+                        {{ selectedDepartmentLabel || '—' }}
+                    </span>
+                </ng-container>
+                <ng-template #allDepts>
+                    &bull; <span class="italic">Afișezi toate serviciile</span>
+                </ng-template>
+                <span *ngIf="cheapServicesCount"
+                    class="ml-4 inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    {{ cheapServicesCount }} sub 100 lei
+                </span>
+                <span *ngIf="avgDuration" class="ml-4 inline-flex items-center gap-1 text-blue-700 dark:text-blue-300">
+                    <i class="fa-regular fa-clock"></i>
+                    Durată medie: {{ avgDuration }} min
+                </span>
+            </span>
+        </div>
+
+        <!-- BANNER BONUS -->
+        <div class="mb-8 flex justify-center">
+            <div
+                class="max-w-xl flex items-center gap-3 bg-green-50 dark:bg-green-900/40 border-l-4 border-green-400 px-6 py-4 rounded-2xl shadow">
+                <span class="material-icons text-green-600 dark:text-green-300 text-3xl"></span>
+                <div class="text-sm">
+                    <div class="font-semibold mb-1 text-green-700 dark:text-green-200">
+                        Știai că?
+                        <span class="font-normal text-gray-700 dark:text-gray-100">Poți să-ți rezervi rapid o
+                            consultație pentru orice serviciu listat mai jos, direct din contul tău!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRID SERVICII -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             <div *ngFor="let service of services"
                 class="relative group bg-gradient-to-tr from-gray-50 to-white dark:from-gray-800 dark:to-gray-900
-        border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col">
+                    border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col">
 
                 <div class="absolute top-4 right-4" [ngClass]="getDepartmentColor(service.department?.name)"
                     matTooltip="Specializarea serviciului">
                     <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full tracking-wide shadow-sm">
-                        {{ service.department?.name }}
+                        {{ service.department?.name || '—' }}
                     </span>
                 </div>
 
@@ -42,13 +112,17 @@
                     </div>
                 </div>
 
-                <button class="mt-5 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
-                text-white font-medium py-2.5 px-4 rounded-lg text-sm tracking-wide transition-all"
+                <button
+                    class="mt-5 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+                text-white font-medium py-2.5 px-4 rounded-lg text-sm tracking-wide transition-all flex items-center justify-center gap-2"
                     [routerLink]="['/patient/services', service.id, 'doctors']">
+                    <span class="material-icons text-base"></span>
                     Vezi medici disponibili
                 </button>
-
             </div>
+        </div>
+        <div class="mt-16 text-center text-gray-400 text-xs">
+            Listă actualizată automat. Pentru orice neclarități, folosește chat-ul de asistență sau sună la recepție.
         </div>
     </div>
 </section>

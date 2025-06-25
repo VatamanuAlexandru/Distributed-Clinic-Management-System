@@ -9,7 +9,7 @@ import { JwtInterceptor } from './app/services/auth/jwt.interceptor';
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi()), // ✅ asta da DI pentru toate lazy routes!
+    provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ]
 });

@@ -5,17 +5,121 @@
             <h2 class="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-400 mb-2">
                 Programările mele
             </h2>
+
+            <p class="text-gray-500 dark:text-gray-400 text-lg mb-3 max-w-xl mx-auto">
+                <span class="block mb-1">
+                    Aici regăsești toate programările tale medicale, actualizate în timp real.
+                </span>
+                Fiecare consultație contează pentru sănătatea ta! Fii mereu la curent cu statusul fiecărei vizite și
+                organizează-ți calendarul medical fără griji.
+            </p>
+
+            <div *ngIf="appointments.length" class="flex flex-wrap gap-4 justify-center mt-5">
+                <div
+                    class="flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg text-blue-700 dark:text-blue-200 shadow text-base font-semibold">
+                    <span class="material-icons"></span>
+                    Total: <span class="font-bold">{{ appointments.length }}</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-lg text-green-700 dark:text-green-200 shadow text-base font-semibold">
+                    <span class="material-icons"></span>
+                    Confirmate: <span class="font-bold">{{ confirmedCount }}</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/30 px-4 py-2 rounded-lg text-yellow-700 dark:text-yellow-200 shadow text-base font-semibold">
+                    <span class="material-icons"></span>
+                    În așteptare: <span class="font-bold">{{ pendingCount }}</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 bg-red-100 dark:bg-red-900/30 px-4 py-2 rounded-lg text-red-700 dark:text-red-200 shadow text-base font-semibold">
+                    <span class="material-icons"></span>
+                    Anulate: <span class="font-bold">{{ cancelledCount }}</span>
+                </div>
+            </div>
+
+            <div *ngIf="nextAppointment" class="mt-8 flex flex-col items-center">
+                <div
+                    class="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-900 dark:to-blue-600 text-white px-6 py-4 rounded-2xl shadow-lg">
+                    <span class="material-icons text-3xl animate-pulse"></span>
+                    <div>
+                        <div class="text-lg font-semibold">Următoarea programare:</div>
+                        <div>
+                            {{ nextAppointment.appointmentDate }} &bull; {{ nextAppointment.doctorName }}
+                        </div>
+                        <div class="text-sm opacity-90">{{ nextAppointment.reason }}</div>
+                        <div *ngIf="nextAppointment.office" class="text-xs mt-1">
+                            Locație: <span class="font-semibold">{{ nextAppointment.office?.name }}, Camera {{
+                                nextAppointment.office?.roomNumber }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-500 dark:text-gray-300 max-w-sm mx-auto">
+                    Nu uita să ajungi cu cel puțin 10 minute mai devreme și să ai la tine actul de identitate!
+                </div>
+            </div>
+
+            <div class="mt-8 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto text-base leading-relaxed">
+                <span class="font-semibold text-blue-600 dark:text-blue-400">
+                    Poți sorta și filtra programările, vezi rapid ce urmează, iar pentru fiecare poți deschide detalii
+                    suplimentare.
+                </span>
+                <br>
+                <span class="block mt-3">Apasă pe oricare programare din listă pentru a vedea toate detaliile: medic,
+                    cabinet, oră, motiv și status actualizat.</span>
+            </div>
+        </div>
+
+        <div *ngIf="appointments.length" class="flex flex-col md:flex-row gap-2 justify-center items-center mb-8">
+            <div class="relative w-full max-w-xs">
+                <input [(ngModel)]="searchText" (ngModelChange)="filterAppointments()"
+                    placeholder="Caută după medic, motiv, status..."
+                    class="pl-10 pr-4 py-2 w-full border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div class="flex gap-2">
+                <button (click)="statusFilter = ''; filterAppointments()"
+                    [ngClass]="statusFilter === '' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Toate</button>
+                <button (click)="statusFilter = 'CONFIRMED'; filterAppointments()"
+                    [ngClass]="statusFilter === 'CONFIRMED' ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Confirmate</button>
+                <button (click)="statusFilter = 'PENDING'; filterAppointments()"
+                    [ngClass]="statusFilter === 'PENDING' ? 'bg-yellow-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">În așteptare</button>
+                <button (click)="statusFilter = 'CANCELLED'; filterAppointments()"
+                    [ngClass]="statusFilter === 'CANCELLED' ? 'bg-red-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Anulate</button>
+            </div>
+        </div>
+
+        <div *ngIf="appointments.length" class="flex flex-wrap gap-4 justify-center mb-4 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-4 h-4 bg-green-600 rounded-full"></span> Confirmată
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-4 h-4 bg-yellow-500 rounded-full"></span> În așteptare
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-4 h-4 bg-red-600 rounded-full"></span> Anulată
+            </div>
         </div>
 
         <div
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-3xl overflow-hidden">
             <div class="p-6 sm:p-8">
-                <app-table [columns]="columns" [data]="appointments" [actions]="['vezi']"
+                <app-table [columns]="columns" [data]="filteredAppointments" [actions]="['vezi']"
                     (action)="handleAction($event)">
                 </app-table>
+                <div *ngIf="filteredAppointments.length === 0"
+                    class="py-8 text-center text-gray-400 dark:text-gray-500 text-base">
+                    Nicio programare găsită după filtrare.
+                </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -23,7 +127,6 @@
     <div
         class="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 relative animate-fade-in-down transition-all overflow-y-auto max-h-[90vh]">
 
-        <!-- Close -->
         <button (click)="selectedAppointment = null"
             class="absolute top-5 right-5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -32,38 +135,33 @@
             </svg>
         </button>
 
-        <!-- Header -->
         <div class="text-center mb-8">
             <h2 class="text-4xl font-extrabold text-blue-700 dark:text-blue-400">Detalii Programare</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Informații complete despre consultație</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Toate detaliile legate de această consultație sunt
+                afișate mai jos.<br>Fii atent la status și la eventuale schimbări!</p>
         </div>
 
-        <!-- Grid Content -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-
-            <!-- Medic -->
             <div class="flex items-start gap-3">
                 <div class="bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <span class="material-icons"></span>
                 </div>
                 <div>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Medic</p>
                     <p class="font-semibold text-gray-900 dark:text-white text-base">
                         {{ selectedAppointment?.doctor?.medicalTitle?.name }} {{
-                        selectedAppointment?.doctor?.person?.firstName }}
-                        {{ selectedAppointment?.doctor?.person?.lastName }}
+                        selectedAppointment?.doctor?.person?.firstName }} {{
+                        selectedAppointment?.doctor?.person?.lastName }}
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500"
+                        *ngIf="selectedAppointment?.doctor?.person?.email">
+                        {{ selectedAppointment?.doctor?.person?.email }}
                     </p>
                 </div>
             </div>
-
-            <!-- Specializare -->
             <div class="flex items-start gap-3">
                 <div class="bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-200 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5-6l3 3-3 3" />
-                    </svg>
+                    <span class="material-icons"></span>
                 </div>
                 <div>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Specializare</p>
@@ -72,14 +170,9 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Cabinet -->
             <div class="flex items-start gap-3">
                 <div class="bg-teal-100 dark:bg-teal-800 text-teal-700 dark:text-teal-200 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V5a2 2 0 012-2h3l2 2h4a2 2 0 012 2v14a2 2 0 01-2 2z" />
-                    </svg>
+                    <span class="material-icons"></span>
                 </div>
                 <div>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Cabinet</p>
@@ -88,30 +181,23 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Dată și oră -->
             <div class="flex items-start gap-3">
                 <div class="bg-orange-100 dark:bg-orange-800 text-orange-700 dark:text-orange-200 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <span class="material-icons"></span>
                 </div>
                 <div>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Dată & Oră</p>
                     <p class="text-base text-gray-900 dark:text-white">
                         {{ selectedAppointment?.appointmentDate }}
                     </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500" *ngIf="selectedAppointment?.createdAt">
+                        Creată la: {{ selectedAppointment?.createdAt | date:'short' }}
+                    </p>
                 </div>
             </div>
-
-            <!-- Motiv -->
             <div class="sm:col-span-2 flex items-start gap-3">
                 <div class="bg-yellow-100 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-100 p-2 rounded-full">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 17h5l-1.405-1.405M4 4l16 16M9 7h.01M12 9h.01M15 11h.01M6 12h.01M18 12h.01M9 15h.01M12 17h.01" />
-                    </svg>
+                    <span class="material-icons"></span>
                 </div>
                 <div>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Motiv</p>
@@ -120,27 +206,31 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Status -->
             <div>
                 <p class="text-gray-500 dark:text-gray-400 font-medium">Status</p>
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="{
-              'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200': selectedAppointment?.status === 'CONFIRMED',
-              'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200': selectedAppointment?.status === 'PENDING',
-              'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200': selectedAppointment?.status === 'CANCELLED'
-            }">
+                  'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200': selectedAppointment?.status === 'CONFIRMED',
+                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200': selectedAppointment?.status === 'PENDING',
+                  'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200': selectedAppointment?.status === 'CANCELLED'
+                }">
                     {{ selectedAppointment?.status }}
                 </span>
             </div>
-
-            <!-- Creat la -->
             <div>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Creată la</p>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">Ultima modificare</p>
                 <p class="text-base text-gray-900 dark:text-white">
-                    {{ selectedAppointment?.createdAt | date:'short' }}
+                    {{ selectedAppointment?.updatedAt ? (selectedAppointment?.updatedAt | date:'short') : '—' }}
                 </p>
             </div>
-
+        </div>
+        <div class="mt-8 text-center text-xs text-gray-400">
+            Pentru orice detalii suplimentare, contactează clinica sau medicul direct.<br>
+            Dacă nu poți ajunge la programare, folosește secțiunea <b>Anulează programarea</b> din contul tău sau anunță
+            direct la recepție.
+            <div class="mt-3">
+                <span class="italic text-blue-600 dark:text-blue-300">Sănătatea ta contează – planifică și ajustează
+                    vizitele fără stres!</span>
+            </div>
         </div>
     </div>
 </div>

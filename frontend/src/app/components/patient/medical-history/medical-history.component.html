@@ -1,33 +1,97 @@
 <section class="min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white py-24 px-6">
     <div class="max-w-6xl mx-auto">
 
-        <div class="mb-12 text-center">
+        <!-- HEADER & STATISTICI -->
+        <div class="mb-8 text-center">
             <h2 class="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-400 mb-2">
                 Istoricul meu medical
             </h2>
-        </div>
-
-        <div *ngIf="history.length === 0" class="text-center text-gray-600 dark:text-gray-400 text-lg">
-            Nu există înregistrări medicale.
-        </div>
-
-        <div *ngFor="let entry of history" (click)="goToDetails(entry)"
-            class="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl p-6 mb-6 transition-all duration-300">
-
-            <div class="flex items-start gap-4">
+            <div *ngIf="!history.length" class="text-gray-500 dark:text-gray-400 text-lg">
+                Nicio înregistrare medicală momentan.
+            </div>
+            <div *ngIf="history.length" class="flex flex-wrap gap-4 justify-center my-6">
                 <div
-                    class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-2xl">
-                    {{ entry.type === 'DIAGNOSIS' ? '🩺' : '🧪' }}
+                    class="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg text-blue-700 dark:text-blue-200 shadow text-base font-semibold">
+                    Total înregistrări: <span class="font-bold">{{ history.length }}</span>
                 </div>
+                <div
+                    class="bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-lg text-green-700 dark:text-green-200 shadow text-base font-semibold">
+                    Primul eveniment:
+                    <span class="font-bold">{{ history[history.length-1]?.date | date:'dd.MM.yyyy' }}</span>
+                </div>
+                <div
+                    class="bg-indigo-100 dark:bg-indigo-900/30 px-4 py-2 rounded-lg text-indigo-700 dark:text-indigo-200 shadow text-base font-semibold">
+                    Ultimul eveniment:
+                    <span class="font-bold">{{ history[0]?.date | date:'dd.MM.yyyy' }}</span>
+                </div>
+                <!-- Progress bar: câte DIAGNOSIS vs TEST -->
+                <div class="flex flex-col justify-center">
+                    <div class="mb-1 text-xs text-gray-500 dark:text-gray-400 text-center">Distribuție</div>
+                    <div
+                        class="flex h-4 w-44 rounded overflow-hidden shadow ring-1 ring-blue-200 dark:ring-blue-900/50">
+                        <div [style.width.%]="diagnosisPercent" class="bg-blue-400 dark:bg-blue-700"></div>
+                        <div [style.width.%]="testPercent" class="bg-teal-400 dark:bg-teal-600"></div>
+                    </div>
+                    <div class="flex justify-between text-xs mt-1">
+                        <span class="text-blue-600 dark:text-blue-300">Diagnostic: {{ diagnosisCount }}</span>
+                        <span class="text-teal-600 dark:text-teal-300">Test: {{ testCount }}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Filtru tip -->
+            <div *ngIf="history.length" class="flex gap-2 justify-center mt-4 mb-1">
+                <button (click)="typeFilter = ''; filterHistory()"
+                    [ngClass]="typeFilter === '' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Toate</button>
+                <button (click)="typeFilter = 'DIAGNOSIS'; filterHistory()"
+                    [ngClass]="typeFilter === 'DIAGNOSIS' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Diagnostic</button>
+                <button (click)="typeFilter = 'TEST'; filterHistory()"
+                    [ngClass]="typeFilter === 'TEST' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+                    class="px-4 py-1 rounded-full font-medium shadow transition">Test</button>
+            </div>
+        </div>
 
+        <!-- DESCRIERE -->
+        <div class="mb-8 max-w-2xl mx-auto text-center text-gray-700 dark:text-gray-300 text-base leading-relaxed">
+            <div class="font-semibold text-blue-700 dark:text-blue-300 mb-1">Toate vizitele, diagnosticele și analizele
+                tale – într-un singur loc:</div>
+            <ul class="list-disc list-inside text-sm space-y-1 mt-1">
+                <li>• Fiecare eveniment medical e afișat cronologic, cu detalii rapide.</li>
+                <li>• Poți filtra pe tip (diagnostic/test) pentru o privire de ansamblu.</li>
+                <li>• Apasă pe o înregistrare pentru a vedea mai multe detalii sau pentru a accesa lista completă de
+                    analize.</li>
+            </ul>
+        </div>
+
+        <!-- ISTORIC -->
+        <div *ngIf="filteredHistory.length === 0 && history.length"
+            class="text-center text-gray-500 dark:text-gray-400 text-lg">
+            Nicio înregistrare pentru filtrul ales.
+        </div>
+        <div *ngFor="let entry of filteredHistory; let i = index" (click)="goToDetails(entry)"
+            class="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md hover:shadow-xl p-6 mb-6 transition-all duration-300">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 flex items-center justify-center rounded-full
+                        bg-blue-100 dark:bg-blue-900
+                        text-blue-600 dark:text-blue-300 text-2xl
+                        border-2 border-transparent
+                        group-hover:border-blue-400 dark:group-hover:border-blue-600
+                        transition">
+                    <ng-container *ngIf="entry.type === 'DIAGNOSIS'; else testIcon">🩺</ng-container>
+                    <ng-template #testIcon>🧪</ng-template>
+                </div>
                 <div class="flex-1">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">
                         {{ entry.type === 'DIAGNOSIS' ? 'Diagnostic medical' : 'Test medical' }}
+                        <span *ngIf="entry.type === 'TEST' && entry.data.result && isCritical(entry.data.result)"
+                            class="ml-2 px-2 py-0.5 rounded bg-red-100 text-red-600 dark:bg-red-900/60 dark:text-red-300 text-xs font-bold align-middle">
+                            Rezultat critic
+                        </span>
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
                         {{ entry.date | date:'EEEE, d MMMM yyyy, HH:mm' }}
                     </p>
-
                     <div *ngIf="entry.type === 'DIAGNOSIS'" class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                         <p><strong>Boală:</strong> {{ entry.data.condition?.name }}</p>
                         <p *ngIf="entry.data.condition?.symptoms?.length">
@@ -38,7 +102,6 @@
                             {{ entry.data.treatment.details }}
                         </p>
                     </div>
-
                     <div *ngIf="entry.type === 'TEST'" class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                         <p><strong>Test:</strong> {{ entry.data.testName }}</p>
                         <p><strong>Categorie:</strong> {{ entry.data.category }}</p>
@@ -46,6 +109,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Confidentialitate -->
+        <div class="mt-10 text-center text-xs text-gray-400 dark:text-gray-600 italic">
+            Informațiile tale medicale sunt confidențiale și disponibile doar pentru tine.<br>
+            Pentru interpretarea rezultatelor, consultă întotdeauna un medic.
         </div>
     </div>
 </section>

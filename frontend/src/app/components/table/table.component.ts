@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-table',
@@ -14,6 +14,8 @@ export class TableComponent {
   @Input() actions: string[] = [];
   @Input() rowClassFunction?: (row: any) => string;
 
+  @ContentChild('cell', { static: false }) cellTemplate?: TemplateRef<any>;
+
   @Output() action = new EventEmitter<{ type: string; row: any }>();
   @Output() sort = new EventEmitter<{ key: string; direction: 'asc' | 'desc' }>();
 
@@ -23,7 +25,6 @@ export class TableComponent {
   pageSize: number = 10;
   currentPage: number = 0;
 
-
   paginatedData(): any[] {
     const arr = this.data ?? [];
     const startIndex = this.currentPage * this.pageSize;
@@ -32,7 +33,7 @@ export class TableComponent {
 
   totalPages(): number {
     const length = (this.data ?? []).length;
-    return Math.ceil(length / this.pageSize);
+    return Math.ceil(length / this.pageSize) || 1;
   }
 
   nextPage(): void {

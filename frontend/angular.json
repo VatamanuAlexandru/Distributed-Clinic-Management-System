@@ -35,12 +35,7 @@
             ],
             "scripts": [
               "node_modules/flowbite/dist/flowbite.min.js"
-            ],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
@@ -68,20 +63,16 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "frontend:build"
-          },
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "browserTarget": "frontend:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "browserTarget": "frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
-        }
-      ,
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
@@ -93,7 +84,7 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -138,12 +129,7 @@
             "styles": [
               "projects/patient-app/src/styles.scss"
             ],
-            "scripts": [],
-            "server": "projects/patient-app/src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "projects/patient-app/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -171,6 +157,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "patient-app:build"
+          },
           "configurations": {
             "production": {
               "buildTarget": "patient-app:build:production"
@@ -237,12 +226,7 @@
             "styles": [
               "projects/doctor-app/src/styles.scss"
             ],
-            "scripts": [],
-            "server": "projects/doctor-app/src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "projects/doctor-app/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -270,6 +254,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "doctor-app:build"
+          },
           "configurations": {
             "production": {
               "buildTarget": "doctor-app:build:production"
@@ -336,12 +323,7 @@
             "styles": [
               "projects/admin-app/src/styles.scss"
             ],
-            "scripts": [],
-            "server": "projects/admin-app/src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "projects/admin-app/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -369,6 +351,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "admin-app:build"
+          },
           "configurations": {
             "production": {
               "buildTarget": "admin-app:build:production"
@@ -390,7 +375,7 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "src/polyfills.ts"
             ],
             "tsConfig": "projects/admin-app/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",

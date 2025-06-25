@@ -1,0 +1,105 @@
+<section class="min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <h2 class="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-400 mb-2">
+                Analizele mele medicale
+            </h2>
+
+            <!-- Statistici scurte -->
+            <div *ngIf="!isLoading && filtered.length" class="flex flex-wrap justify-center gap-4 my-6">
+                <div
+                    class="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg text-blue-700 dark:text-blue-200 shadow text-base font-semibold">
+                    Total analize: <span class="font-bold">{{ filtered.length }}</span>
+                </div>
+                <div
+                    class="bg-green-100 dark:bg-green-900/30 px-4 py-2 rounded-lg text-green-700 dark:text-green-200 shadow text-base font-semibold">
+                    Prima analiză:
+                    <span class="font-bold">{{ filtered[filtered.length-1]?.testDate | date:'dd.MM.yyyy' }}</span>
+                </div>
+                <div
+                    class="bg-indigo-100 dark:bg-indigo-900/30 px-4 py-2 rounded-lg text-indigo-700 dark:text-indigo-200 shadow text-base font-semibold">
+                    Ultima analiză:
+                    <span class="font-bold">{{ filtered[0]?.testDate | date:'dd.MM.yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="text-gray-500 dark:text-gray-400 text-lg mb-3">
+                <span *ngIf="!isLoading">({{ filtered.length }} rezultate găsite)</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-2 mt-2">
+                <!-- Search bar -->
+                <div class="relative w-full max-w-xs">
+                    <input [(ngModel)]="filterText" (ngModelChange)="onFilterChange()"
+                        placeholder="Caută analiză, categorie, rezultat..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <button (click)="exportCSV()"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition"
+                    [disabled]="!filtered.length">
+                    Export
+                </button>
+            </div>
+
+            <!-- Info text - descriere frumoasă -->
+            <div
+                class="mt-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto text-base leading-relaxed border-l-4 border-blue-200 dark:border-blue-500 pl-6 py-2 bg-blue-50/40 dark:bg-blue-900/20">
+                <div class="font-semibold text-blue-700 dark:text-blue-300 mb-1">Ai la dispoziție o arhivă digitală a
+                    tuturor analizelor tale medicale, ușor de explorat și gestionat:</div>
+                <ul class="list-disc list-inside text-sm space-y-1 mt-1">
+                    <li>• Vizualizezi rapid rezultate, date și categorii de analize.</li>
+                    <li>• Filtrezi și sortezi tabelul cu un singur click.</li>
+                    <li>• Poți exporta totul în format CSV pentru backup, print sau a le trimite medicului.</li>
+                    <li>• Accesibil pe orice dispozitiv, cu aspect optimizat pentru luminozitate sau întuneric.</li>
+                </ul>
+                <div class="mt-2 text-[13px] text-blue-800 dark:text-blue-200/80 italic">
+                    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M12 17h.01M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Datele tale medicale sunt confidențiale și vizibile doar pentru tine.
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading & error states -->
+        <div *ngIf="isLoading" class="flex justify-center py-24 text-blue-500 text-xl">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+        </div>
+        <div *ngIf="error" class="text-center text-red-500 py-8">{{ error }}</div>
+        <div *ngIf="!isLoading && filtered.length === 0" class="text-center text-gray-600 dark:text-gray-400 text-lg">
+            Nu există analize înregistrate.
+        </div>
+
+        <!-- TABELUL CU APP-TABLE -->
+        <app-table *ngIf="!isLoading && filtered.length" [columns]="columns" [data]="filtered" [actions]="[]"
+            (sort)="onSort($event)" [rowClassFunction]="rowClassFunction">
+            <ng-template #cell let-row let-col="column">
+                <span *ngIf="col.key === 'testDate'" [title]="row.testDate | date:'fullDate'">
+                    {{ row.testDate | date:'dd.MM.yyyy' }}
+                </span>
+                <span *ngIf="col.key !== 'testDate'">
+                    {{ row[col.key] || '-' }}
+                </span>
+            </ng-template>
+        </app-table>
+
+        <!-- Last update info -->
+        <div *ngIf="!isLoading && tests.length" class="mt-10 text-center text-gray-400 text-xs">
+            <span>Ultima actualizare: {{ tests[0].testDate ? (tests[0].testDate | date:'short') : '-' }}</span>
+        </div>
+
+        <!-- Confidentialitate extra -->
+        <div class="mt-6 text-xs text-center text-gray-400 dark:text-gray-600 italic">
+            Pentru securitatea ta, nu partaja datele medicale pe rețele nesecurizate.<br>
+            Dacă ai întrebări legate de rezultate, consultă medicul tău curant.
+        </div>
+    </div>
+</section>

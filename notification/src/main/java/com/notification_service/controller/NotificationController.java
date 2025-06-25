@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.notification_service.dto.NotificationRequest;
+import com.clinic.common.dto.NotificationRequest;
 import com.notification_service.entity.Notification;
 import com.notification_service.service.NotificationService;
 
@@ -23,10 +23,10 @@ public class NotificationController {
 	private NotificationService notificationService;
 
 	@PostMapping
-	public ResponseEntity<Notification> notify(@RequestBody NotificationRequest request) {
-		Notification notif = notificationService.sendNotification(request.getPatientId(), request.getMessage(),
+	public ResponseEntity<Void> notify(@RequestBody NotificationRequest request) {
+		notificationService.sendNotification(request.getUserId(), request.getEmail(), request.getMessage(),
 				request.getType());
-		return ResponseEntity.ok(notif);
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/{patientId}")

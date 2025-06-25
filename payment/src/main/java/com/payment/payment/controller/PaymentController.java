@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,7 @@ public class PaymentController {
 		return ResponseEntity.ok(doc);
 	}
 
+	@Transactional
 	@GetMapping("/by-patient/{patientId}")
 	public ResponseEntity<List<PaymentObligationRecord>> getObligationsForPatient(@PathVariable Long patientId) {
 		List<PaymentObligation> obligations = paymentObligationRepository.findByPatientIdWithDocuments(patientId);

@@ -1,171 +1,219 @@
-import { Component, OnInit } from '@angular/core';
-import { PaymentObligationRecord, PaymentService } from '../../../services/payment/payment.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import * as XLSX from 'xlsx';
+import { PaymentService, PaymentObligationRecord } from '../../../services/payment/payment.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { Subscription } from 'rxjs';
+import { TableComponent } from '../../table/table.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-payment',
-  templateUrl: './payment.component.html',
-  styleUrls: [],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, TableComponent, FormsModule],
+  templateUrl: './payment.component.html'
 })
-export class PaymentComponent implements OnInit {
-  obligations: PaymentObligationRecord[] = [];
-  filteredObligations: PaymentObligationRecord[] = [];
-  loading = true;
-  patientId: number | null = null;
-  selectedObligation: PaymentObligationRecord | null = null;
-  toast: { message: string, type: 'success' | 'error' } | null = null;
+export class PaymentComponent implements OnInit, OnDestroy {
+  obligations: any[] = [];
+  totalPaid = 0;
+  totalDue = 0;
+  paidPercent = 0;
   errorMessage: string | null = null;
-  filterStatus: 'all' | 'paid' | 'partial' | 'unpaid' = 'all';
-  page: number = 1;
-  pageSize: number = 6;
+  payModalOpen = false;
+  obligationToPay: any = null;
+  payForm = { card: '', exp: '', cvv: '' };
+  obligationDetails: any = null;
+  docsObligation: any = null;
+
+  // Statistici avansate
+  topObligations: any[] = [];
+  lastPayment: any = null;
+  unpaidCategories: { description: string, rest: number, percent: number }[] = [];
+  donutLabels = ['Plătit', 'Rest'];
+  donutData = [0, 0];
+  donutColors = [{ backgroundColor: ['#2563eb', '#ef4444'] }];
+  donutOptions = { responsive: true, cutout: '70%', plugins: { legend: { display: false } } };
+
+  tableColumns = [
+    { key: 'description', label: 'Descriere' },
+    { key: 'dueDate', label: 'Scadentă', type: 'date' },
+    { key: 'amount', label: 'Total', type: 'currency' },
+    { key: 'paidAmount', label: 'Plătit', type: 'currency' },
+    { key: 'statusLabel', label: 'Status', type: 'status' },
+    { key: 'actions', label: 'Acțiuni' }
+  ];
+
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private paymentService: PaymentService,
     private authService: AuthService
   ) { }
-  ngOnInit() {
-    console.log("IN ON INIT"); // <-- vezi dacă intri aici!
-    this.authService.getCurrentPatientId().subscribe({
-      next: id => {
-        console.log('GOT PATIENT ID:', id); // <--- vezi dacă primești ID
-        this.patientId = id;
-        this.fetchObligations();
-      },
-      error: (err) => {
-        console.log('ERROR GETTING PATIENT ID', err); // <---
-        this.showToast('Eroare la identificarea pacientului!', 'error');
-        this.errorMessage = 'Nu am putut identifica utilizatorul. Te rugăm să încerci din nou.';
-        this.loading = false;
-      }
+
+  ngOnInit(): void {
+    const authSub = this.authService.getCurrentPatientId().subscribe({
+      next: id => this.loadObligations(id),
+      error: () => this.errorMessage = 'Eroare la autentificare.'
     });
+    this.subscriptions.push(authSub);
   }
 
-  fetchObligations() {
-    if (this.patientId === null) return;
-    this.loading = true;
-    this.errorMessage = null;
-    this.paymentService.getPatientObligations(this.patientId).subscribe({
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  loadObligations(patientId: number): void {
+    const obligationsSub = this.paymentService.getPatientObligations(patientId).subscribe({
       next: data => {
-        console.log('OBLIGATIONS:', data); // <---- AICI
-        this.obligations = data;
-        this.applyFilter();
-        this.loading = false;
+        this.obligations = data.map(ob => ({
+          ...this.mapWithComputedFields(ob)
+        }));
+        this.computeStats();
+        this.computeAdvancedStats();
+        this.docsObligation = null;
       },
-      error: (err) => {
-        console.log('ERROR:', err); // <---- AICI
-        this.showToast('Eroare la încărcarea plăților!', 'error');
-        this.errorMessage = 'Am întâmpinat o problemă la încărcarea plăților. Te rugăm să încerci din nou.';
-        this.loading = false;
-      }
+      error: () => this.errorMessage = 'Eroare la încărcarea plăților.'
     });
+    this.subscriptions.push(obligationsSub);
   }
 
-
-  payNow(obligation: PaymentObligationRecord) {
-    const payload = {
-      obligationId: obligation.id,
-      documentType: 'RECEIPT',
-      paymentType: 'CARD',
-      paidAmount: obligation.amount - this.getPaidAmount(obligation),
-      successful: true
-    };
-    this.paymentService.payObligation(payload).subscribe({
-      next: () => {
-        this.showToast('Plata efectuată cu succes!', 'success');
-        this.fetchObligations();
-      },
-      error: () => {
-        this.showToast('Eroare la procesarea plății!', 'error');
-        this.errorMessage = 'Nu am putut procesa plata. Te rugăm să verifici conexiunea și să încerci din nou.';
-      }
-    });
+  mapWithComputedFields(ob: PaymentObligationRecord): any {
+    const paidAmount = ob.documents?.filter(d => d.successful).reduce((sum, d) => sum + (d.paidAmount || 0), 0) || 0;
+    const status = paidAmount >= ob.amount ? 'paid' : paidAmount > 0 ? 'partial' : 'unpaid';
+    const statusLabel = status === 'paid' ? 'Plătit' : status === 'partial' ? 'Parțial' : 'Neplătit';
+    return { ...ob, paidAmount, status, statusLabel };
   }
 
-  openDetails(obligation: PaymentObligationRecord) {
-    this.selectedObligation = obligation;
+  computeStats(): void {
+    const total = this.obligations.reduce((sum, ob) => sum + ob.amount, 0);
+    const paid = this.obligations.reduce((sum, ob) => sum + ob.paidAmount, 0);
+    this.totalPaid = paid;
+    this.totalDue = Math.max(0, total - paid);
+    this.paidPercent = total ? Math.min(100, Math.round((paid / total) * 100)) : 0;
   }
 
-  closeDetails() {
-    this.selectedObligation = null;
-  }
-
-  getPaidAmount(obligation: PaymentObligationRecord): number {
-    return obligation.documents?.filter(d => d.successful).reduce((s, d) => s + (d.paidAmount || 0), 0) || 0;
-  }
-
-  getStatus(obligation: PaymentObligationRecord): 'paid' | 'partial' | 'unpaid' {
-    if (obligation.paid) return 'paid';
-    const paid = this.getPaidAmount(obligation);
-    if (paid > 0) return 'partial';
-    return 'unpaid';
-  }
-
-  showToast(message: string, type: 'success' | 'error') {
-    this.toast = { message, type };
-    setTimeout(() => this.toast = null, 2500);
-  }
-
-  getPaidPercentage(): number {
-    if (this.obligations.length === 0) return 0;
-    const totalPaid = this.obligations.reduce((sum, ob) => sum + this.getPaidAmount(ob), 0);
-    const totalAmount = this.obligations.reduce((sum, ob) => sum + ob.amount, 0);
-    return Math.round((totalPaid / totalAmount) * 100) || 0;
-  }
-
-  getTotalPaid(): number {
-    return this.obligations.reduce((sum, ob) => sum + this.getPaidAmount(ob), 0) || 0;
-  }
-
-  getTotalDue(): number {
-    return this.obligations.reduce((sum, ob) => sum + (ob.amount - this.getPaidAmount(ob)), 0) || 0;
-  }
-
-  getRecentPayments(): any[] {
-    const payments = [];
-    for (const ob of this.obligations) {
-      if (ob.documents && ob.documents.length > 0) {
-        for (const doc of ob.documents) {
-          if (doc.successful) {
-            payments.push({
-              description: ob.description,
-              documentType: doc.documentType,
-              paymentType: doc.paymentType,
-              paidAmount: doc.paidAmount,
-              createdAt: doc.createdAt
-            });
-          }
-        }
+  onTableAction(event: { type: string; row: any }) {
+    if (event.type === 'pay') {
+      this.openPayModal(event.row);
+    }
+    if (event.type === 'details') {
+      this.openObligationDetails(event.row);
+    }
+    if (event.type === 'docs') {
+      if (this.docsObligation && this.docsObligation.id === event.row.id) {
+        this.docsObligation = null;
+      } else {
+        this.docsObligation = event.row;
       }
     }
-    return payments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3);
   }
 
-  setFilter(status: 'all' | 'paid' | 'partial' | 'unpaid') {
-    this.filterStatus = status;
-    this.page = 1;
-    this.applyFilter();
+  openPayModal(obligation: any) {
+    this.payForm = { card: '', exp: '', cvv: '' };
+    this.obligationToPay = obligation;
+    this.payModalOpen = true;
   }
 
-  applyFilter() {
-    this.filteredObligations = this.obligations.filter(ob => {
-      if (this.filterStatus === 'all') return true;
-      return this.getStatus(ob) === this.filterStatus;
+  closePayModal() {
+    this.payModalOpen = false;
+    this.obligationToPay = null;
+  }
+
+  submitPayment() {
+    if (!this.obligationToPay) return;
+    const rest = this.obligationToPay.amount - this.obligationToPay.paidAmount;
+    if (rest <= 0) return;
+
+    this.paymentService.payObligation({
+      obligationId: this.obligationToPay.id,
+      documentType: 'RECEIPT',
+      paymentType: 'CARD',
+      paidAmount: rest,
+      successful: true
+    }).subscribe({
+      next: () => {
+        this.closePayModal();
+        this.authService.getCurrentPatientId().subscribe({
+          next: id => this.loadObligations(id),
+          error: () => this.errorMessage = 'Eroare la autentificare.'
+        });
+      },
+      error: () => {
+        this.errorMessage = 'Eroare la procesarea plății.';
+        this.closePayModal();
+      }
     });
   }
 
-  changePage(delta: number) {
-    this.page += delta;
-    if (this.page < 1) this.page = 1;
-    const maxPage = Math.ceil(this.filteredObligations.length / this.pageSize);
-    if (this.page > maxPage) this.page = maxPage;
+  openObligationDetails(obligation: any) {
+    this.obligationDetails = { ...obligation };
   }
 
-  calculateTotalPages(totalItems: number, pageSize: number): number {
+  closeObligationDetails() {
+    this.obligationDetails = null;
+  }
 
-    return Math.ceil(totalItems / pageSize);
+  computeAdvancedStats() {
+    // Top 3 obligații
+    this.topObligations = [...this.obligations].sort((a, b) => b.amount - a.amount).slice(0, 3);
 
+    // Ultima plată
+    let docs: Array<{
+      id: number;
+      createdAt: string;
+      paidAmount: number;
+      successful: boolean;
+      description: string;
+    }> = this.obligations.flatMap((ob: PaymentObligationRecord) =>
+      (ob.documents || []).filter((d: { successful: boolean }) => d.successful).map((d: { id: number; createdAt: string; paidAmount: number; successful: boolean }) => ({
+        ...d, description: ob.description
+      }))
+    );
+    docs = docs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    this.lastPayment = docs.length ? docs[0] : null;
+
+    // Sume neplătite per descriere
+    const total = this.obligations.reduce((sum, ob) => sum + ob.amount, 0);
+    this.unpaidCategories = this.obligations
+      .filter(ob => ob.amount - ob.paidAmount > 0)
+      .map(ob => ({
+        description: ob.description,
+        rest: ob.amount - ob.paidAmount,
+        percent: total ? Math.round((ob.amount - ob.paidAmount) * 100 / total) : 0
+      }));
+
+    // Donut chart
+    const paid = this.obligations.reduce((sum, ob) => sum + ob.paidAmount, 0);
+    this.donutData = [paid, total - paid > 0 ? total - paid : 0];
+  }
+
+  exportExcel() {
+    const ws = XLSX.utils.json_to_sheet(this.obligations.map(ob => ({
+      Descriere: ob.description,
+      Scadenta: ob.dueDate,
+      Suma: ob.amount,
+      Platit: ob.paidAmount,
+      Status: ob.statusLabel
+    })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Obligatii');
+    XLSX.writeFile(wb, 'obligatii.xlsx');
+  }
+
+  exportCSV() {
+    const rows = [
+      ['Descriere', 'Scadenta', 'Suma', 'Platit', 'Status'],
+      ...this.obligations.map(ob => [
+        ob.description, ob.dueDate, ob.amount, ob.paidAmount, ob.statusLabel
+      ])
+    ];
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'obligatii.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 }

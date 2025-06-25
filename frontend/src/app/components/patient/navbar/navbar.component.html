@@ -10,32 +10,62 @@
       </div>
 
       <div class="hidden md:flex space-x-6">
-        <a routerLink="/patient" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+        <a [routerLink]="['/patient']" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Dashboard
         </a>
-        <a routerLink="/patient/medici" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+        <a [routerLink]="['/patient/medici']"
+          routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Medici
         </a>
-        <a routerLink="/patient/services" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+        <a [routerLink]="['/patient/services']"
+          routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Servicii
         </a>
-        <a routerLink="/patient/appointments"
+        <a [routerLink]="['/patient/appointments']"
           routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Programări
         </a>
-        <a routerLink="/patient/medical-history"
+        <a [routerLink]="['/patient/medical-history']"
           routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Istoric medical
         </a>
-        <a routerLink="/patient/payments" routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
+        <a [routerLink]="['/patient/payments']"
+          routerLinkActive="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-white"
           class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
           Plăți
         </a>
+      </div>
+
+      <!-- Notificări -->
+      <div class="relative ml-4">
+        <button (click)="toggleDropdown()" class="relative focus:outline-none">
+          <i class="fa-solid fa-bell text-2xl"></i>
+          <span *ngIf="unreadCount > 0"
+            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs px-1 animate-ping">{{ unreadCount
+            }}</span>
+        </button>
+        <div *ngIf="showDropdown"
+          class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+          <div class="flex justify-between items-center px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <span class="font-semibold">Notificări</span>
+            <button class="text-xs text-blue-500" (click)="markAllAsRead()">Marchează ca citite</button>
+          </div>
+          <ng-container *ngIf="notifications.length; else emptyNotif">
+            <div *ngFor="let notif of notifications.slice(0, 10)"
+              class="p-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="font-medium">{{ notif.message }}</div>
+              <div class="text-xs text-gray-400">{{ notif.createdAt ? (notif.createdAt | date:'short') : '' }}</div>
+            </div>
+          </ng-container>
+          <ng-template #emptyNotif>
+            <div class="p-4 text-gray-400">Nicio notificare.</div>
+          </ng-template>
+        </div>
       </div>
 
       <button (click)="toggleTheme()"
@@ -45,11 +75,11 @@
       </button>
 
       <div class="ml-4">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">
+        <button 
+          class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">
           Ieșire
         </button>
       </div>
-
     </div>
   </div>
 </nav>

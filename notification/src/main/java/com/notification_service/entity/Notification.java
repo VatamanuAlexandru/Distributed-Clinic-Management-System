@@ -1,6 +1,7 @@
 package com.notification_service.entity;
 
 import com.clinic.common.AuditablePersistableEntity;
+import com.clinic.common.dto.NotificationType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

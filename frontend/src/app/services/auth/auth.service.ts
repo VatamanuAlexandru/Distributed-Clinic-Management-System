@@ -47,4 +47,9 @@ export class AuthService {
     return this.http.get<number>(`${this.baseUrl}/currentDoctorId`);
   }
 
+  getCurrentUserId(): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/currentUserId`);
+  }
+  
+
 }

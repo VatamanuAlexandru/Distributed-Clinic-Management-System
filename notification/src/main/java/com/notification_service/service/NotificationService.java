@@ -2,13 +2,14 @@ package com.notification_service.service;
 
 import java.util.List;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 
+import com.clinic.common.dto.NotificationType;
 import com.clinic.common.service.BaseService;
 import com.notification_service.entity.Notification;
-import com.notification_service.entity.NotificationType;
 import com.notification_service.repository.NotificationRepository;
 
 @Service
@@ -17,18 +18,30 @@ public class NotificationService extends BaseService<Notification> {
 	@Autowired
 	private NotificationRepository notificationRepository;
 
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
+
+	@Autowired
+	private EmailService emailService;
+
 	@Override
 	protected JpaRepository<Notification, Long> getRepository() {
 		return notificationRepository;
 	}
 
-	public Notification sendNotification(Long patientId, String message, NotificationType type) {
+	public void sendNotification(Long userId, String email, String message, NotificationType type) {
 		Notification notif = new Notification();
-		notif.setPatientId(patientId);
+		notif.setPatientId(userId);
 		notif.setMessage(message);
 		notif.setType(type);
 		notif.setRead(false);
-		return notificationRepository.save(notif);
+		messagingTemplate.convertAndSend("/topic/notifications/" + userId, notif);
+
+		if (email != null && !email.isEmpty()) {
+			String subject = "Notificare clinică";
+			emailService.sendEmail(email, subject, message);
+		}
+		notificationRepository.save(notif);
 	}
 
 	public List<Notification> getPatientNotifications(Long patientId) {

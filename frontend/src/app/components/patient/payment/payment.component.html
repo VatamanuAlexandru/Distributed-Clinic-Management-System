@@ -1,275 +1,280 @@
-<div class="max-w-6xl mx-auto mt-12 px-4 font-sans">
-    <!-- Title -->
-    <h2
-        class="text-4xl font-semibold mb-10 text-blue-600 dark:text-blue-300 tracking-tight text-center animate-fade-in">
-        Plățile tale 💸
-    </h2>
+<div class="flex">
+    <main
+        class="flex-1 min-h-screen p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+        <div class="max-w-7xl mx-auto py-8 px-4">
 
-    <!-- Filter -->
-    <div class="flex justify-between items-center mb-6 animate-slide-up">
-        <div class="flex space-x-2">
-            <button class="px-4 py-2 rounded-lg text-sm font-medium" [ngClass]="{
-                  'bg-blue-500 text-white': filterStatus === 'all',
-                  'bg-gray-100 text-gray-700': filterStatus !== 'all'
-                }" (click)="setFilter('all')">Toate</button>
-            <button class="px-4 py-2 rounded-lg text-sm font-medium" [ngClass]="{
-                  'bg-green-500 text-white': filterStatus === 'paid',
-                  'bg-gray-100 text-gray-700': filterStatus !== 'paid'
-                }" (click)="setFilter('paid')">Plătite</button>
-            <button class="px-4 py-2 rounded-lg text-sm font-medium" [ngClass]="{
-                  'bg-yellow-500 text-white': filterStatus === 'partial',
-                  'bg-gray-100 text-gray-700': filterStatus !== 'partial'
-                }" (click)="setFilter('partial')">Parțial</button>
-            <button class="px-4 py-2 rounded-lg text-sm font-medium" [ngClass]="{
-                  'bg-red-500 text-white': filterStatus === 'unpaid',
-                  'bg-gray-100 text-gray-700': filterStatus !== 'unpaid'
-                }" (click)="setFilter('unpaid')">Neplătite</button>
-        </div>
-    </div>
-
-    <!-- Error Message -->
-    <div *ngIf="errorMessage"
-        class="mb-6 p-4 bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg text-center animate-fade-in">
-        {{ errorMessage }}
-    </div>
-
-    <!-- Statistics -->
-    <div *ngIf="!loading && filteredObligations.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 shadow-lg animate-slide-up"
-            [style.animation-delay]="'0ms'">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Progres plăți</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Ai achitat {{ getPaidPercentage() }}%</p>
-            <div class="mt-4 h-3 bg-gray-200 dark:bg-gray-700 rounded-full">
-                <div class="h-full bg-blue-500 rounded-full transition-all duration-700"
-                    [style.width]="getPaidPercentage() + '%'"></div>
-            </div>
-            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-3">{{ getPaidPercentage() }}%</p>
-        </div>
-        <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 shadow-lg animate-slide-up"
-            [style.animation-delay]="'100ms'">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Total plătit</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Suma achitată</p>
-            <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-3">{{ getTotalPaid() | currency:'RON' }}
-            </p>
-        </div>
-        <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 shadow-lg animate-slide-up"
-            [style.animation-delay]="'200ms'">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Total de plată</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Suma rămasă</p>
-            <p class="text-2xl font-bold text-red-600 dark:text-red-400 mt-3">{{ getTotalDue() | currency:'RON' }}</p>
-        </div>
-    </div>
-
-    <!-- Loading Skeleton -->
-    <div *ngIf="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-        <div *ngFor="let i of [1,2,3]"
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 space-y-4 border border-gray-200 dark:border-gray-700">
-            <div class="flex justify-between">
-                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-            </div>
-            <div class="space-y-2">
-                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/5"></div>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Obligations Grid -->
-    <div *ngIf="!loading && filteredObligations.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let ob of filteredObligations | slice: (page-1) * pageSize : page * pageSize; let i = index"
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500 transform hover:scale-105 transition-all duration-300 animate-fade-in"
-            [style.animation-delay]="i * 100 + 'ms'">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-base font-medium text-gray-900 dark:text-white truncate max-w-[70%]">{{ ob.description
-                    }}</h3>
-                <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ ob.amount | currency:'RON' }}</p>
-            </div>
-            <div class="space-y-2 mb-4">
-                <p class="text-xs text-gray-600 dark:text-gray-400">Scadentă: {{ ob.dueDate | date:'yyyy-MM-dd' }}</p>
-                <p class="text-xs flex items-center">
-                    Status:
-                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold" [ngClass]="{
-                    'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': getStatus(ob) === 'paid',
-                    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300': getStatus(ob) === 'partial',
-                    'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300': getStatus(ob) === 'unpaid'
-                  }">
-                        {{ getStatus(ob) | titlecase }}
-                    </span>
+            <!-- Header + Overview -->
+            <div class="mb-12 text-center">
+                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">Plăți</h1>
+                <p class="text-gray-500 dark:text-gray-300 mt-2 text-lg">
+                    Toate informațiile despre obligațiile financiare, organizate și accesibile
                 </p>
-                <div class="text-xs text-gray-600 dark:text-gray-400">
-                    Plătit: {{ getPaidAmount(ob) | currency:'RON' }} / {{ ob.amount | currency:'RON' }}
-                    <div class="mt-2 h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                        <div class="h-full bg-blue-500 rounded-full transition-all duration-500"
-                            [style.width]="(getPaidAmount(ob) / ob.amount * 100) + '%'"></div>
+            </div>
+
+            <!-- Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="overview-card">
+                    <div class="flex items-center gap-4">
+                        <div class="text-green-500 text-2xl"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <div class="text-gray-500 text-xs uppercase font-semibold mb-1">Total Plătit</div>
+                            <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ totalPaid |
+                                currency:'RON' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="flex items-center gap-4">
+                        <div class="text-red-500 text-2xl"><i class="fas fa-exclamation-circle"></i></div>
+                        <div>
+                            <div class="text-gray-500 text-xs uppercase font-semibold mb-1">Rest de Plată</div>
+                            <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ totalDue | currency:'RON'
+                                }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="flex items-center gap-4">
+                        <div class="text-blue-500 text-2xl"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <div class="text-gray-500 text-xs uppercase font-semibold mb-1">Progres Achitat</div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ paidPercent
+                                    }}%</span>
+                                <div
+                                    class="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full relative overflow-hidden">
+                                    <div class="h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-700"
+                                        [style.width]="(paidPercent > 100 ? 100 : paidPercent) + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="flex items-center gap-4">
+                        <div class="text-indigo-500 text-2xl"><i class="fas fa-file-invoice"></i></div>
+                        <div>
+                            <div class="text-gray-500 text-xs uppercase font-semibold mb-1">Obligații Totale</div>
+                            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ obligations.length
+                                }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end space-x-3">
-                <button *ngIf="getStatus(ob) !== 'paid'"
-                    class="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 transform hover:scale-110 transition-all duration-200 flex items-center text-sm"
-                    (click)="payNow(ob)">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M12 8v4l3 3" />
-                    </svg>
-                    Plătește
-                </button>
-                <button
-                    class="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-200 transform hover:scale-110 transition-all duration-200 flex items-center text-sm"
-                    (click)="openDetails(ob)">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Detalii
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Pagination -->
-    <div *ngIf="!loading && filteredObligations.length > pageSize" class="flex justify-center mt-6">
-        <button class="px-4 py-2 mx-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200" [disabled]="page === 1"
-            (click)="changePage(-1)">
-            Înapoi
-        </button>
-        <span class="px-4 py-2 mx-1 text-gray-700">Pagina {{ page }} / {{
-            calculateTotalPages(filteredObligations.length,
-            pageSize) }}</span>
-        <button class="px-4 py-2 mx-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-            [disabled]="page === calculateTotalPages(filteredObligations.length, pageSize)" (click)="changePage(1)">
-            Înainte
-        </button>
-    </div>
-
-    <!-- Recent Payments -->
-    <div *ngIf="!loading && filteredObligations.length > 0"
-        class="mt-10 bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-md animate-slide-up">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ultimele plăți</h3>
-        <div *ngIf="getRecentPayments().length > 0" class="space-y-3">
-            <div *ngFor="let payment of getRecentPayments()" class="flex justify-between items-center text-sm">
-                <div>
-                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ payment.description }}</span>
-                    <span class="text-gray-600 dark:text-gray-400"> ({{ payment.documentType }} / {{ payment.paymentType
-                        }})</span>
+            <!-- Statistici avansate -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <!-- Top 3 obligații ca sumă -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                    <div class="font-semibold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                        <i class="fas fa-trophy text-yellow-500"></i> Top 3 Obligații (sumă)
+                    </div>
+                    <ol class="pl-3 list-decimal space-y-1">
+                        <li *ngFor="let top of topObligations">
+                            {{ top.description }}
+                            <span class="font-bold text-blue-700 dark:text-blue-300 ml-2">{{ top.amount | currency:'RON'
+                                }}</span>
+                        </li>
+                    </ol>
                 </div>
-                <div class="text-right">
-                    <span class="font-semibold text-gray-900 dark:text-gray-100">{{ payment.paidAmount | currency:'RON'
-                        }}</span>
-                    <div class="text-xs text-gray-400">{{ payment.createdAt | date:'yyyy-MM-dd HH:mm' }}</div>
+                <!-- Ultima plată efectuată -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                    <div class="font-semibold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                        <i class="fas fa-receipt text-green-500"></i> Ultima plată efectuată
+                    </div>
+                    <div *ngIf="lastPayment">
+                        <div class="mb-1 text-sm text-gray-500 dark:text-gray-300">{{ lastPayment.description }}</div>
+                        <div class="text-xl font-bold text-green-600 dark:text-green-400">{{ lastPayment.paidAmount |
+                            currency:'RON' }}</div>
+                        <div class="text-xs text-gray-400 mt-1">{{ lastPayment.createdAt | date:'dd MMM yyyy HH:mm' }}
+                        </div>
+                    </div>
+                    <div *ngIf="!lastPayment" class="text-gray-400 text-sm">Nicio plată recentă.</div>
+                </div>
+                <!-- Suma neplătită, procentual pe serviciu -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                    <div class="font-semibold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                        <i class="fas fa-pie-chart text-blue-500"></i> Rest de plată per serviciu
+                    </div>
+                    <div *ngFor="let c of unpaidCategories" class="flex justify-between text-sm py-1">
+                        <span>{{ c.description }}</span>
+                        <span>
+                            <span class="font-semibold">{{ c.rest | currency:'RON' }}</span>
+                            <span class="ml-1 text-xs text-blue-400">({{ c.percent }}%)</span>
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div *ngIf="getRecentPayments().length === 0" class="text-gray-400 text-sm text-center py-2">
-            Nicio plată recentă.
-        </div>
-    </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!loading && filteredObligations.length === 0 && !errorMessage"
-        class="py-20 text-center animate-fade-in">
-        <svg class="mx-auto w-16 h-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
-            stroke-width="1.5" viewBox="0 0 24 24">
-            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Ești la zi! 🎉</div>
-        <div class="text-sm text-gray-600 dark:text-gray-400">Nu ai nicio plată de efectuat. Facturile noi vor apărea
-            aici.</div>
-    </div>
 
-    <!-- Detalii Modal -->
-    <div *ngIf="selectedObligation"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-        <div
-            class="bg-white dark:bg-gray-900 rounded-3xl p-6 w-full max-w-md shadow-2xl relative transform scale-100 transition-all">
-            <button class="absolute top-4 right-4 text-gray-400 hover:text-blue-600 dark:hover:text-blue-300 transition"
-                (click)="closeDetails()">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Detalii plată</h3>
-            <div class="space-y-3 mb-4 text-sm">
-                <div><strong>Descriere:</strong> {{ selectedObligation.description }}</div>
-                <div><strong>Suma totală:</strong> {{ selectedObligation.amount | currency:'RON' }}</div>
-                <div><strong>Scadentă:</strong> {{ selectedObligation.dueDate | date:'yyyy-MM-dd' }}</div>
-                <div><strong>Status:</strong> {{ getStatus(selectedObligation) | titlecase }}</div>
+
+            <!-- Export butoane -->
+            <div class="flex justify-end gap-3 mb-4">
+                <button class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl hover:bg-blue-700"
+                    (click)="exportExcel()">Export Excel</button>
+                <button class="bg-green-500 text-white font-semibold px-4 py-2 rounded-xl hover:bg-green-600"
+                    (click)="exportCSV()">Export CSV</button>
             </div>
-            <div>
-                <div class="font-semibold mb-2 text-gray-900 dark:text-gray-200 text-sm">Plăți efectuate:</div>
-                <div *ngIf="selectedObligation.documents.length > 0" class="space-y-2">
-                    <div *ngFor="let doc of selectedObligation.documents"
-                        class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-sm">
-                        <div>
-                            <span class="text-xs text-gray-600 dark:text-gray-400">{{ doc.documentType }} / {{
-                                doc.paymentType }}</span>
+
+            <!-- Obligații Financiare în tabel -->
+            <div class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Obligații Financiare</h2>
+                <app-table [data]="obligations" [columns]="tableColumns" [actions]="['pay', 'details', 'docs']"
+                    (action)="onTableAction($event)">
+                </app-table>
+            </div>
+
+            <!-- Documente pentru obligația selectată -->
+            <div *ngIf="docsObligation" class="mb-12">
+                <div class="mb-3 flex items-center gap-3">
+                    <span class="text-base font-semibold text-gray-800 dark:text-white">
+                        Documente plată pentru: <span class="text-blue-600 dark:text-blue-400">{{
+                            docsObligation.description }}</span>
+                    </span>
+                    <button (click)="docsObligation = null"
+                        class="ml-2 px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 text-sm">
+                        Închide
+                    </button>
+                </div>
+                <div *ngIf="docsObligation.documents?.length > 0" class="space-y-3">
+                    <div *ngFor="let doc of docsObligation.documents"
+                        class="flex justify-between items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <span class="font-medium text-gray-900 dark:text-white">{{ doc.documentType }}</span>
+                            <span class="text-gray-400">/</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-300">{{ doc.paymentType }}</span>
+                            <span *ngIf="doc.successful"
+                                class="ml-2 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Succes</span>
+                            <span *ngIf="!doc.successful"
+                                class="ml-2 px-2.5 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Eșuat</span>
                         </div>
                         <div class="text-right">
-                            <span class="font-semibold text-gray-900 dark:text-gray-100">{{ doc.paidAmount |
+                            <span class="font-bold text-green-600 dark:text-green-400">{{ doc.paidAmount |
                                 currency:'RON' }}</span>
-                            <span class="ml-2 px-1.5 py-0.5 rounded-full text-xs font-semibold" [ngClass]="{
-                        'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': doc.successful,
-                        'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300': !doc.successful
-                      }">
-                                {{ doc.successful ? 'Succes' : 'Eșuat' }}
-                            </span>
-                            <div class="text-xs text-gray-400">{{ doc.createdAt | date:'yyyy-MM-dd HH:mm' }}</div>
+                            <span class="block text-xs text-gray-400">{{ doc.createdAt | date:'dd MMM yyyy HH:mm'
+                                }}</span>
                         </div>
                     </div>
                 </div>
-                <div *ngIf="selectedObligation.documents.length === 0" class="text-gray-400 text-xs py-2 text-center">
-                    Nicio plată efectuată.
+                <div *ngIf="!docsObligation.documents || docsObligation.documents.length === 0"
+                    class="text-gray-400 text-sm py-3">
+                    Nicio plată înregistrată pentru această obligație.
+                </div>
+            </div>
+
+            <!-- Modal de plată -->
+            <div *ngIf="payModalOpen"
+                class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 opacity-30">
+                    </div>
+                    <button (click)="closePayModal()"
+                        class="absolute right-4 top-4 text-gray-500 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-2xl font-bold z-10">×</button>
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center relative z-10">
+                        Efectuează Plata</h3>
+                    <div class="space-y-6 relative z-10">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-200 font-medium mb-2">Număr Card</label>
+                            <input [(ngModel)]="payForm.card" type="text" maxlength="19" class="input-premium"
+                                placeholder="0000 0000 0000 0000" />
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-gray-700 dark:text-gray-200 font-medium mb-2">Data
+                                    Expirării</label>
+                                <input [(ngModel)]="payForm.exp" type="text" maxlength="5" class="input-premium"
+                                    placeholder="MM/AA" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-gray-700 dark:text-gray-200 font-medium mb-2">CVV</label>
+                                <input [(ngModel)]="payForm.cvv" type="text" maxlength="3" class="input-premium"
+                                    placeholder="123" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-200 font-medium mb-2">Suma de Plată</label>
+                            <input type="text" readonly class="input-premium bg-gray-100 dark:bg-gray-700"
+                                [value]="obligationToPay ? (obligationToPay.amount - obligationToPay.paidAmount | currency:'RON') : ''" />
+                        </div>
+                        <button (click)="submitPayment()"
+                            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-md">
+                            Plătește Acum
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Detalii Obligație -->
+            <div *ngIf="obligationDetails"
+                class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 opacity-30">
+                    </div>
+                    <button (click)="closeObligationDetails()"
+                        class="absolute right-4 top-4 text-gray-500 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-2xl font-bold z-10">×</button>
+                    <h3 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center relative z-10">Detalii
+                        Obligație</h3>
+                    <div class="space-y-4 relative z-10">
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700 dark:text-gray-200">Descriere:</span>
+                            <span class="text-gray-900 dark:text-white">{{ obligationDetails.description }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700 dark:text-gray-200">Suma Totală:</span>
+                            <span class="text-gray-900 dark:text-white">{{ obligationDetails.amount | currency:'RON'
+                                }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700 dark:text-gray-200">Status:</span>
+                            <span class="text-gray-900 dark:text-white">{{ obligationDetails.statusLabel }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700 dark:text-gray-200">Scadență:</span>
+                            <span class="text-gray-900 dark:text-white">{{ obligationDetails.dueDate | date:'dd MMM
+                                yyyy' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-700 dark:text-gray-200">Plătit:</span>
+                            <span class="text-gray-900 dark:text-white">{{ obligationDetails.paidAmount | currency:'RON'
+                                }}</span>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-gray-700 dark:text-gray-200 mb-3">Plăți Efectuate:</h4>
+                            <div *ngIf="obligationDetails.documents && obligationDetails.documents.length > 0"
+                                class="space-y-3">
+                                <div *ngFor="let doc of obligationDetails.documents"
+                                    class="flex justify-between items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                                    <div class="flex items-center gap-3">
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ doc.documentType
+                                            }}</span>
+                                        <span class="text-gray-400">/</span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300">{{ doc.paymentType
+                                            }}</span>
+                                        <span *ngIf="doc.successful"
+                                            class="ml-2 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Succes</span>
+                                        <span *ngIf="!doc.successful"
+                                            class="ml-2 px-2.5 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Eșuat</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="font-bold text-green-600 dark:text-green-400">{{ doc.paidAmount |
+                                            currency:'RON' }}</span>
+                                        <span class="block text-xs text-gray-400">{{ doc.createdAt | date:'dd MMM yyyy
+                                            HH:mm' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!obligationDetails.documents || obligationDetails.documents.length === 0"
+                                class="text-gray-400 text-sm py-3">
+                                Nicio plată înregistrată pentru această obligație.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div *ngIf="toast"
-        class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl font-semibold text-sm shadow-lg transition animate-slide-up"
-        [ngClass]="{
-           'bg-green-500 text-white': toast.type === 'success',
-           'bg-red-500 text-white': toast.type === 'error'
-         }">
-        {{ toast.message }}
-    </div>
+    </main>
 </div>
-
-<style>
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    @keyframes slide-up {
-        from {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    .animate-fade-in {
-        animation: fade-in 0.6s ease-out;
-    }
-
-    .animate-slide-up {
-        animation: slide-up 0.6s ease-out;
-    }
-</style>

@@ -28,6 +28,10 @@ public class UserService extends BaseService<User> implements UserDetailsService
 		return userRepository.findByEmail(email);
 	}
 
+	public Optional<User> findByPersonId(Long personId) {
+		return userRepository.findByPersonId(personId);
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		return findByEmail(email)

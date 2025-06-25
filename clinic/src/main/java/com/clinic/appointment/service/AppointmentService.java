@@ -17,9 +17,13 @@ import com.clinic.appointment.dto.AppointmentRecord;
 import com.clinic.appointment.entity.Appointment;
 import com.clinic.appointment.entity.AppointmentStatus;
 import com.clinic.appointment.repository.AppointmentRepository;
+import com.clinic.client.NotificationClient;
 import com.clinic.client.PaymentClient;
 import com.clinic.client.PersonClient;
+import com.clinic.client.UserClient;
 import com.clinic.common.dto.CreatePaymentObligationRequest;
+import com.clinic.common.dto.NotificationRequest;
+import com.clinic.common.dto.NotificationType;
 import com.clinic.common.service.BaseService;
 import com.clinic.doctor.dto.DoctorRecord;
 import com.clinic.doctor.entity.Doctor;
@@ -54,6 +58,12 @@ public class AppointmentService extends BaseService<Appointment> {
 
 	@Autowired
 	private PaymentClient paymentClient;
+
+	@Autowired
+	private NotificationClient notificationClient;
+
+	@Autowired
+	private UserClient userClient;
 
 	@Override
 	protected JpaRepository<Appointment, Long> getRepository() {
@@ -187,6 +197,21 @@ public class AppointmentService extends BaseService<Appointment> {
 			request.setDueDate(appointment.getAppointmentDate());
 
 			paymentClient.createPaymentObligation(request);
+			Long personId = appointment.getPatient().getPersonId();
+			Map<String, Object> userInfo = userClient.getEmailAndUserIdByPersonId(personId);
+
+			Long userId = ((Integer) userInfo.get("userId")).longValue();
+			String email = (String) userInfo.get("email");
+
+			NotificationRequest notif = new NotificationRequest();
+			notif.setUserId(userId);
+			notif.setEmail(email);
+			notif.setMessage("Programarea ta la " + appointment.getService().getName() + " pe "
+					+ appointment.getAppointmentDate() + " a fost CONFIRMATĂ!");
+			notif.setType(NotificationType.APPOINTMENT);
+
+			notificationClient.notify(notif);
+
 		}
 	}
 
